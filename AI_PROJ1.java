@@ -1,5 +1,6 @@
 import javafx.scene.Scene;
 //test
+import java.util.*;
 import javafx.application.Application;
 import javafx.beans.property.*;
 import javafx.beans.value.*;
@@ -20,10 +21,18 @@ public class AI_PROJ1 extends Application {
     Polygon triangle = createStartingTriangle();
     Polygon triangle1 = createSecondTriangle();
     Group root = new Group();
+    
     root.getChildren().add(triangle);
     root.getChildren().addAll(createControlAnchorsFor(triangle.getPoints()));
     root.getChildren().add(triangle1);
     root.getChildren().addAll(createControlAnchorsFor(triangle1.getPoints()));
+     //= new virtualToRealPolygon(triangle.getPoints());
+    //List<Double> vtriangletestlist = virtualToRealPolygon(triangle.getPoints().toList().toBlocking().single());
+    Polygon vtriangle = new Polygon();
+    vtriangle.getPoints().setAll(virtualToRealPolygon(triangle.getPoints()));
+    //vtriangle.setStroke(Color.BLUE);
+    vtriangle.setStrokeWidth(1);
+    root.getChildren().addAll(vtriangle);
     stage.setTitle("AI_PROJ1");
     stage.setScene(
         new Scene(
@@ -39,11 +48,9 @@ public class AI_PROJ1 extends Application {
     Polygon triangle = new Polygon();
 
     triangle.getPoints().setAll(
-        100d, 50d,
+        50d, 50d,
         100d, 100d,
-        100d, 150d,
-        150d, 150d,
-        150d, 100d
+        50d, 150d
     );
 
     triangle.setStroke(Color.BLUE);
@@ -52,7 +59,24 @@ public class AI_PROJ1 extends Application {
     triangle.setFill(Color.BLUE);
     return triangle;
   }
+  private ObservableList<Double> virtualToRealPolygon(final ObservableList<Double> rpoints){
+   ObservableList<Double> vpoints = FXCollections.observableArrayList();
+    for(int i = 0; i < rpoints.size(); i+= 2){
+        vpoints.add(rpoints.get(i) + 86.6);
+        vpoints.add(rpoints.get(i+1) + 50.0);
+        
+        vpoints.add(rpoints.get(i));
+        //vpoints.add(rpoints.get(i));
 
+        //vpoints.add(rpoints.get(i+1));
+        vpoints.add(rpoints.get(i+1));
+    }
+    return vpoints;
+    //Polygon triangle = new Polygon();
+    //triangle.getPoints().setAll(vpoints);
+    //return triangle;
+  
+  }
   private Polygon createSecondTriangle() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(

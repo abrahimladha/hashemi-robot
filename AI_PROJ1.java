@@ -31,9 +31,10 @@ public class AI_PROJ1 extends Application {
     //List<Double> vtriangletestlist = virtualToRealPolygon(triangle.getPoints().toList().toBlocking().single());
     Polygon vtriangle = new Polygon();
     vtriangle.getPoints().setAll(getConvexHull(virtualToRealPolygon(triangle.getPoints())));
-    vtriangle.setStroke(Color.BLUE);
+    vtriangle.setStroke(Color.BLACK);
     vtriangle.setStrokeWidth(1);
     root.getChildren().addAll(vtriangle);
+    //root.getChildren().addAll(createControlAnchorsFor(vtriangle.getPoints()));
     stage.setTitle("AI_PROJ1");
     stage.setScene(
         new Scene(
@@ -115,7 +116,8 @@ public class AI_PROJ1 extends Application {
 
     triangle.getPoints().setAll(
         50d, 50d,
-        100d, 100d,
+        150d, 50d,
+        150d, 150d,
         50d, 150d
     );
 
@@ -128,11 +130,14 @@ public class AI_PROJ1 extends Application {
   private ObservableList<Double> virtualToRealPolygon(final ObservableList<Double> rpoints){
    ObservableList<Double> vpoints = FXCollections.observableArrayList();
     for(int i = 0; i < rpoints.size(); i+= 2){
+       // vpoints.add(rpoints.get(i));
+       // vpoints.add(rpoints.get(i+1));
         vpoints.add(rpoints.get(i) + 100.0);
         vpoints.add(rpoints.get(i+1) + 100.0);
-        
-        vpoints.add(rpoints.get(i));
-        vpoints.add(rpoints.get(i+1));
+    }
+    for(int j = 0; j < rpoints.size(); j+= 2){
+        vpoints.add(rpoints.get(j));
+        vpoints.add(rpoints.get(j+1));
     }
     return vpoints;
     //Polygon triangle = new Polygon();

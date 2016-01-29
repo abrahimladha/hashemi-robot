@@ -30,7 +30,7 @@ public class AI_PROJ1 extends Application {
      //= new virtualToRealPolygon(triangle.getPoints());
     //List<Double> vtriangletestlist = virtualToRealPolygon(triangle.getPoints().toList().toBlocking().single());
     Polygon vtriangle = new Polygon();
-    vtriangle.getPoints().setAll(getConvexHull(virtualToRealPolygon(triangle.getPoints())));
+    vtriangle.getPoints().setAll(pointSorter(getConvexHull(virtualToRealPolygon(triangle.getPoints()))));
     vtriangle.setStroke(Color.BLACK);
     vtriangle.setStrokeWidth(1);
     root.getChildren().addAll(vtriangle);
@@ -44,6 +44,42 @@ public class AI_PROJ1 extends Application {
     );
     stage.show();
   }
+  private ObservableList<Double> pointSorter(ObservableList<Double> s){
+    double centerX = 0, centerY = 0;
+    for(int i = 0; i < s.size(); i+=2){
+        centerX += s.get(i);
+        centerY += s.get(i+1);
+    }
+    centerX /= (s.size()/2);
+    centerY /= (s.size()/2);
+    ArrayList<Double> angles = new ArrayList<>();
+    for (int j = 0; j < s.size(); j+=2){
+        angles.add(Math.atan2(s.get(j) - centerX , s.get(j+1) - centerY));
+    }
+    for(int k = angles.size() - 1; k >= 0; k--){
+        for(int w = 1; w < k; w++){
+            if(angles.get(w-1) > angles.get(w)){
+                double temp = angles.get(w-1);
+                angles.set(w-1,angles.get(w));
+                angles.set(w, temp);
+
+                double tempx = s.get(2*(w-1));
+                double tempy = s.get(2*(w-1) + 1);
+
+                s.set(2*(w-1), s.get(2*w));
+                s.set(2*(w-1)+1, s.get((2*w) + 1));
+
+                s.set(2*w, tempx);
+                s.set((2*w)+1, tempy);
+                
+            }
+        }
+    }
+    return s;
+  }
+  
+  
+  
   private ObservableList<Double> getConvexHull(ObservableList<Double> s){
     Point2D[] myPoints = new Point2D[s.size()/2];
     for(int i = 0; i < myPoints.length; i++)

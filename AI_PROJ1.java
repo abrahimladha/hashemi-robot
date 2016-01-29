@@ -30,9 +30,12 @@ public class AI_PROJ1 extends Application {
      //= new virtualToRealPolygon(triangle.getPoints());
     //List<Double> vtriangletestlist = virtualToRealPolygon(triangle.getPoints().toList().toBlocking().single());
     Polygon vtriangle = new Polygon();
-    vtriangle.getPoints().setAll(pointSorter(getConvexHull(virtualToRealPolygon(triangle.getPoints()))));
+    //Polygon sh = sh.union(vtriangle, triangle);
+    vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints()))));
+    //vtriangle.getPoints().setAll(pointSorter(getConvexHull(shape.getPoints())));
     vtriangle.setStroke(Color.BLACK);
     vtriangle.setStrokeWidth(1);
+    vtriangle.setFill(Color.TRANSPARENT);
     root.getChildren().addAll(vtriangle);
     //root.getChildren().addAll(createControlAnchorsFor(vtriangle.getPoints()));
     stage.setTitle("AI_PROJ1");
@@ -54,7 +57,7 @@ public class AI_PROJ1 extends Application {
     centerY /= (s.size()/2);
     ArrayList<Double> angles = new ArrayList<>();
     for (int j = 0; j < s.size(); j+=2){
-        angles.add(Math.atan2(s.get(j) - centerX , s.get(j+1) - centerY));
+        angles.add(Math.atan2(s.get(j+1) - centerY , s.get(j) - centerX));
     }
     for(int k = angles.size() - 1; k >= 0; k--){
         for(int w = 1; w < k; w++){
@@ -111,10 +114,14 @@ public class AI_PROJ1 extends Application {
       }
    }
     ObservableList<Double> pnts = FXCollections.observableArrayList();
+    //System.out.println(Arrays.toStringo(H.toArray()));
     for(int j = 0; j < H.size(); j++){
-        pnts.add(myPoints[j].getX());
-        pnts.add(myPoints[j].getY());
+        pnts.add(H.get(j).getX());
+        pnts.add(H.get(j).getY());
     }
+    //System.out.println(pnts.toString());
+    //System.out.println(Arrays.toString)
+    
     return pnts;
   }
   //}
@@ -140,7 +147,9 @@ public class AI_PROJ1 extends Application {
             rightMostIndex = i;
         }
         
-    }
+   }
+   System.out.println(p[rightMostIndex].getX());
+   System.out.println(p[rightMostIndex].getY());
     return p[rightMostIndex];
   }
   
@@ -151,10 +160,17 @@ public class AI_PROJ1 extends Application {
     Polygon triangle = new Polygon();
 
     triangle.getPoints().setAll(
-        50d, 50d,
+        100d,50d,
+        200d,100d,
+        200d, 200d, 
+        125d, 300d, 
+        75d, 300d,
+        50d, 200d,
+        75d, 100d
+       /* 50d,50d,
         150d, 50d,
         150d, 150d,
-        50d, 150d
+        50d, 150d*/
     );
 
     triangle.setStroke(Color.BLUE);
@@ -166,14 +182,14 @@ public class AI_PROJ1 extends Application {
   private ObservableList<Double> virtualToRealPolygon(final ObservableList<Double> rpoints){
    ObservableList<Double> vpoints = FXCollections.observableArrayList();
     for(int i = 0; i < rpoints.size(); i+= 2){
-       // vpoints.add(rpoints.get(i));
-       // vpoints.add(rpoints.get(i+1));
-        vpoints.add(rpoints.get(i) + 100.0);
-        vpoints.add(rpoints.get(i+1) + 100.0);
+        vpoints.add(rpoints.get(i));
+        vpoints.add(rpoints.get(i+1));
+        //vpoints.add(rpoints.get(i) + 100.0);
+        //vpoints.add(rpoints.get(i+1) + 100.0);
     }
     for(int j = 0; j < rpoints.size(); j+= 2){
-        vpoints.add(rpoints.get(j));
-        vpoints.add(rpoints.get(j+1));
+        vpoints.add(rpoints.get(j)+25);
+        vpoints.add(rpoints.get(j+1)+43.0);
     }
     return vpoints;
     //Polygon triangle = new Polygon();

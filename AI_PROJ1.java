@@ -1,42 +1,59 @@
 import javafx.scene.Scene;
-//test
 import java.util.*;
 import javafx.application.Application;
 import javafx.beans.property.*;
 import javafx.beans.value.*;
 import javafx.collections.*;
 import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
 import javafx.scene.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
 import javafx.geometry.Point2D;
+import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.layout.*;
 
 /** Drag the anchors around to change a polygon's points. */
 public class AI_PROJ1 extends Application {
-  public static void main(String[] args) throws Exception { launch(args); }
 
-  // main application layout logic.
+  public static void main(String[] args) throws Exception { launch(args); }
+    static Polygon vtriangle = new Polygon();
+    static Polygon triangle = createStartingTriangle();
+    static double a = 10.0;
+    // main application layout logic.
   @Override public void start(final Stage stage) throws Exception {
-    Polygon triangle = createStartingTriangle();
+    //Polygon triangle = createStartingTriangle();
     Polygon triangle1 = createSecondTriangle();
     Group root = new Group();
+    Button plusbutton = new Button("+");
+    Button minusbutton = new Button("-");
     
-    root.getChildren().add(triangle);
-    root.getChildren().addAll(createControlAnchorsFor(triangle.getPoints()));
-    root.getChildren().add(triangle1);
-    root.getChildren().addAll(createControlAnchorsFor(triangle1.getPoints()));
-     //= new virtualToRealPolygon(triangle.getPoints());
-    //List<Double> vtriangletestlist = virtualToRealPolygon(triangle.getPoints().toList().toBlocking().single());
-    Polygon vtriangle = new Polygon();
-    //Polygon sh = sh.union(vtriangle, triangle);
-    vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints()))));
+    plusButton handler1 = new plusButton();
+    plusbutton.setOnAction(handler1);
+    
+    minusButton handler2 = new minusButton();
+    minusbutton.setOnAction(handler2);
+
+    HBox hb = new HBox();
+    VBox vb = new VBox();
+    Pane box = new Pane();
+    hb.getChildren().addAll(plusbutton,minusbutton);
+    box.getChildren().add(triangle);
+    box.getChildren().addAll(createControlAnchorsFor(triangle.getPoints()));
+    box.getChildren().add(triangle1);
+    box.getChildren().addAll(createControlAnchorsFor(triangle1.getPoints()));
+    
+    vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
     //vtriangle.getPoints().setAll(pointSorter(getConvexHull(shape.getPoints())));
     vtriangle.setStroke(Color.BLACK);
     vtriangle.setStrokeWidth(1);
     vtriangle.setFill(Color.TRANSPARENT);
-    root.getChildren().addAll(vtriangle);
+    box.getChildren().addAll(vtriangle);
+    vb.getChildren().addAll(hb, box);
+    root.getChildren().addAll(vb);
     //root.getChildren().addAll(createControlAnchorsFor(vtriangle.getPoints()));
     stage.setTitle("AI_PROJ1");
     stage.setScene(
@@ -47,6 +64,26 @@ public class AI_PROJ1 extends Application {
     );
     stage.show();
   }
+  class plusButton implements EventHandler<ActionEvent> {
+    @Override
+    public void handle(ActionEvent e){
+        
+        a += 1.0;
+        vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
+        
+    }
+  }
+  
+  class minusButton implements EventHandler<ActionEvent> {
+    @Override
+    public void handle(ActionEvent e){
+        if(a > 1.1){
+        a -= 1.0;
+        vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
+        }
+    }
+  }
+
   private ObservableList<Double> pointSorter(ObservableList<Double> s){
     double centerX = 0, centerY = 0;
     for(int i = 0; i < s.size(); i+=2){
@@ -156,7 +193,7 @@ public class AI_PROJ1 extends Application {
 
 
   // creates a triangle.
-  private Polygon createStartingTriangle() {
+  private static Polygon createStartingTriangle() {
     Polygon triangle = new Polygon();
 
     triangle.getPoints().setAll(
@@ -179,7 +216,7 @@ public class AI_PROJ1 extends Application {
     triangle.setFill(Color.BLUE);
     return triangle;
   }
-  private ObservableList<Double> virtualToRealPolygon(final ObservableList<Double> rpoints){
+  private ObservableList<Double> virtualToRealPolygon(final ObservableList<Double> rpoints, double a){
    ObservableList<Double> vpoints = FXCollections.observableArrayList();
     for(int i = 0; i < rpoints.size(); i+= 2){
         vpoints.add(rpoints.get(i));
@@ -188,8 +225,10 @@ public class AI_PROJ1 extends Application {
         //vpoints.add(rpoints.get(i+1) + 100.0);
     }
     for(int j = 0; j < rpoints.size(); j+= 2){
-        vpoints.add(rpoints.get(j)+25);
-        vpoints.add(rpoints.get(j+1)+43.0);
+        vpoints.add(rpoints.get(j)-(a/2));
+        vpoints.add(rpoints.get(j+1)+(.866*a));
+        vpoints.add(rpoints.get(j) - a);
+        vpoints.add(rpoints.get(j+1));
     }
     return vpoints;
     //Polygon triangle = new Polygon();
@@ -274,6 +313,7 @@ public class AI_PROJ1 extends Application {
       setOnMouseReleased(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
           getScene().setCursor(Cursor.HAND);
+
         }
       });
       setOnMouseDragged(new EventHandler<MouseEvent>() {
@@ -286,6 +326,8 @@ public class AI_PROJ1 extends Application {
           if (newY > 0 && newY < getScene().getHeight()) {
             setCenterY(newY);
           }
+         vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
+
         }
       });
       setOnMouseEntered(new EventHandler<MouseEvent>() {

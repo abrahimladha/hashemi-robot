@@ -21,26 +21,51 @@ public class AI_PROJ1 extends Application {
 
   public static void main(String[] args) throws Exception { launch(args); }
     static Polygon vtriangle = new Polygon();
-    static Polygon triangle = createStartingTriangle();
-    static double a = 10.0;
+    static Polygon triangle = createFirstPolygon();
+    static double a = 20.0;
     // main application layout logic.
+
   @Override public void start(final Stage stage) throws Exception {
-    //Polygon triangle = createStartingTriangle();
+
     Polygon triangle1 = createSecondTriangle();
     Group root = new Group();
     Button plusbutton = new Button("+");
     Button minusbutton = new Button("-");
-    
+    Button resetbutton = new Button("RESET");
+    Button calculatebutton = new Button("CALCULATE");
+
     plusButton handler1 = new plusButton();
     plusbutton.setOnAction(handler1);
-    
+
+
     minusButton handler2 = new minusButton();
     minusbutton.setOnAction(handler2);
+
+
+    resetButton handler3 = new resetButton();
+    resetbutton.setOnAction(handler3);
+    
+
+    calculateButton handler4 = new calculateButton();
+    calculatebutton.setOnAction(handler4);
+
 
     HBox hb = new HBox();
     VBox vb = new VBox();
     Pane box = new Pane();
-    hb.getChildren().addAll(plusbutton,minusbutton);
+
+    hb.setHgrow(plusbutton, Priority.ALWAYS);
+    hb.setHgrow(minusbutton, Priority.ALWAYS);
+    hb.setHgrow(calculatebutton, Priority.ALWAYS);
+    hb.setHgrow(resetbutton, Priority.ALWAYS);
+
+    plusbutton.setMaxWidth(Double.MAX_VALUE);
+    minusbutton.setMaxWidth(Double.MAX_VALUE);
+    resetbutton.setMaxWidth(Double.MAX_VALUE);
+    calculatebutton.setMaxWidth(Double.MAX_VALUE);
+    //asdas
+    //asdasd
+    hb.getChildren().addAll(plusbutton,minusbutton,resetbutton,calculatebutton);
     box.getChildren().add(triangle);
     box.getChildren().addAll(createControlAnchorsFor(triangle.getPoints()));
     box.getChildren().add(triangle1);
@@ -54,20 +79,22 @@ public class AI_PROJ1 extends Application {
     box.getChildren().addAll(vtriangle);
     vb.getChildren().addAll(hb, box);
     root.getChildren().addAll(vb);
+    Scene scene1 = new Scene(root, 1000, 1000, Color.ALICEBLUE);
+    scene1.setOnMouseDragged(new EventHandler<MouseEvent>() {
+        @Override public void handle(MouseEvent mouseEvent) {
+         vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
+        }
+	});
     //root.getChildren().addAll(createControlAnchorsFor(vtriangle.getPoints()));
     stage.setTitle("AI_PROJ1");
     stage.setScene(
-        new Scene(
-            root,
-            400, 400, Color.ALICEBLUE
-        )
+    	scene1
     );
     stage.show();
   }
   class plusButton implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e){
-        
         a += 1.0;
         vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
         
@@ -83,7 +110,55 @@ public class AI_PROJ1 extends Application {
         }
     }
   }
+ class resetButton implements EventHandler<ActionEvent> {
+    @Override
+    public void handle(ActionEvent e){
+        
+    }
+  }
 
+ class calculateButton implements EventHandler<ActionEvent> {
+    @Override
+    public void handle(ActionEvent e){
+    
+    }
+ }
+
+   private static Polygon createFirstPolygon() {
+    Polygon triangle = new Polygon();
+    triangle.getPoints().setAll(
+        400d, 150d,
+        500d, 200d, 
+        550d, 300d,
+        540d, 400d,
+        480d, 480d,
+        370d, 420d,
+        320d, 330d,
+        350d, 240d
+    );
+    triangle.setStroke(Color.BLUE);
+    triangle.setStrokeWidth(4);
+    triangle.setStrokeLineCap(StrokeLineCap.ROUND);
+    triangle.setFill(Color.BLUE);
+    return triangle;
+  }
+   private Polygon createSecondTriangle() {
+    Polygon triangle = new Polygon();
+    triangle.getPoints().setAll(
+        330d, 580d,
+        200d, 600d,
+        150d, 700d, 
+        110d, 830d, 
+        280d, 840d, 
+        370d, 680d
+    );
+
+    triangle.setStroke(Color.BLUE);
+    triangle.setStrokeWidth(4);
+    triangle.setStrokeLineCap(StrokeLineCap.ROUND);
+    triangle.setFill(Color.BLUE);
+    return triangle;
+  }
   private ObservableList<Double> pointSorter(ObservableList<Double> s){
     double centerX = 0, centerY = 0;
     for(int i = 0; i < s.size(); i+=2){
@@ -116,22 +191,15 @@ public class AI_PROJ1 extends Application {
         }
     }
     return s;
-  }
-  
-  
-  
+  }  
   private ObservableList<Double> getConvexHull(ObservableList<Double> s){
     Point2D[] myPoints = new Point2D[s.size()/2];
     for(int i = 0; i < myPoints.length; i++)
         myPoints[i] = new Point2D(s.get(2*i),s.get((2*i)+1));
-
-
-
       Point2D h0 = getRightMostLowestPoint(myPoints);
       ArrayList<Point2D> H = new ArrayList<Point2D>();
       H.add(h0);
       Point2D t0 = h0;
-
       while (true) {
         Point2D t1 = myPoints[0];
         for(int i = 1; i < myPoints.length; i++){
@@ -151,24 +219,18 @@ public class AI_PROJ1 extends Application {
       }
    }
     ObservableList<Double> pnts = FXCollections.observableArrayList();
-    //System.out.println(Arrays.toStringo(H.toArray()));
     for(int j = 0; j < H.size(); j++){
         pnts.add(H.get(j).getX());
         pnts.add(H.get(j).getY());
     }
-    //System.out.println(pnts.toString());
-    //System.out.println(Arrays.toString)
-    
     return pnts;
   }
-  //}
   public double whichSide(double x0, double y0, double x1, double y1, double x2, double y2){
     return (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
   }
   public double distance(double x1, double y1, double x2, double y2) {
   return Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
   }
-
   static Point2D getRightMostLowestPoint(Point2D[] p){
     int rightMostIndex = 0;
     double rightMostX = p[0].getX();
@@ -185,44 +247,14 @@ public class AI_PROJ1 extends Application {
         }
         
    }
-   System.out.println(p[rightMostIndex].getX());
-   System.out.println(p[rightMostIndex].getY());
     return p[rightMostIndex];
   }
-  
 
-
-  // creates a triangle.
-  private static Polygon createStartingTriangle() {
-    Polygon triangle = new Polygon();
-
-    triangle.getPoints().setAll(
-        100d,50d,
-        200d,100d,
-        200d, 200d, 
-        125d, 300d, 
-        75d, 300d,
-        50d, 200d,
-        75d, 100d
-       /* 50d,50d,
-        150d, 50d,
-        150d, 150d,
-        50d, 150d*/
-    );
-
-    triangle.setStroke(Color.BLUE);
-    triangle.setStrokeWidth(4);
-    triangle.setStrokeLineCap(StrokeLineCap.ROUND);
-    triangle.setFill(Color.BLUE);
-    return triangle;
-  }
   private ObservableList<Double> virtualToRealPolygon(final ObservableList<Double> rpoints, double a){
    ObservableList<Double> vpoints = FXCollections.observableArrayList();
     for(int i = 0; i < rpoints.size(); i+= 2){
         vpoints.add(rpoints.get(i));
         vpoints.add(rpoints.get(i+1));
-        //vpoints.add(rpoints.get(i) + 100.0);
-        //vpoints.add(rpoints.get(i+1) + 100.0);
     }
     for(int j = 0; j < rpoints.size(); j+= 2){
         vpoints.add(rpoints.get(j)-(a/2));
@@ -231,26 +263,8 @@ public class AI_PROJ1 extends Application {
         vpoints.add(rpoints.get(j+1));
     }
     return vpoints;
-    //Polygon triangle = new Polygon();
-    //triangle.getPoints().setAll(vpoints);
-    //return triangle;
-  
   }
-  private Polygon createSecondTriangle() {
-    Polygon triangle = new Polygon();
-    triangle.getPoints().setAll(
-        400d, 400d,
-        400d, 425d,
-        425d, 425d,
-        600d, 600d
-    );
 
-    triangle.setStroke(Color.BLUE);
-    triangle.setStrokeWidth(4);
-    triangle.setStrokeLineCap(StrokeLineCap.ROUND);
-    triangle.setFill(Color.BLUE);
-    return triangle;
-  }
 
   // @return a list of anchors which can be dragged around to modify points in the format [x1, y1, x2, y2...]
   private ObservableList<Anchor> createControlAnchorsFor(final ObservableList<Double> points) {
@@ -281,72 +295,5 @@ public class AI_PROJ1 extends Application {
   }
 
   // a draggable anchor displayed around a point.
-  class Anchor extends Circle {
-    private final DoubleProperty x, y;
-
-    Anchor(Color color, DoubleProperty x, DoubleProperty y) {
-      super(x.get(), y.get(), 10);
-      setFill(color);
-      setStroke(color);
-      setStrokeWidth(3);
-      setStrokeType(StrokeType.OUTSIDE);
-
-      this.x = x;
-      this.y = y;
-
-      x.bind(centerXProperty());
-      y.bind(centerYProperty());
-      enableDrag();
-    }
-
-    // make a node movable by dragging it around with the mouse.
-    private void enableDrag() {
-      final Delta dragDelta = new Delta();
-      setOnMousePressed(new EventHandler<MouseEvent>() {
-        @Override public void handle(MouseEvent mouseEvent) {
-          // record a delta distance for the drag and drop operation.
-          dragDelta.x = getCenterX() - mouseEvent.getX();
-          dragDelta.y = getCenterY() - mouseEvent.getY();
-          getScene().setCursor(Cursor.MOVE);
-        }
-      });
-      setOnMouseReleased(new EventHandler<MouseEvent>() {
-        @Override public void handle(MouseEvent mouseEvent) {
-          getScene().setCursor(Cursor.HAND);
-
-        }
-      });
-      setOnMouseDragged(new EventHandler<MouseEvent>() {
-        @Override public void handle(MouseEvent mouseEvent) {
-          double newX = mouseEvent.getX() + dragDelta.x;
-          if (newX > 0 && newX < getScene().getWidth()) {
-            setCenterX(newX);
-          }
-          double newY = mouseEvent.getY() + dragDelta.y;
-          if (newY > 0 && newY < getScene().getHeight()) {
-            setCenterY(newY);
-          }
-         vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
-
-        }
-      });
-      setOnMouseEntered(new EventHandler<MouseEvent>() {
-        @Override public void handle(MouseEvent mouseEvent) {
-          if (!mouseEvent.isPrimaryButtonDown()) {
-            getScene().setCursor(Cursor.HAND);
-          }
-        }
-      });
-      setOnMouseExited(new EventHandler<MouseEvent>() {
-        @Override public void handle(MouseEvent mouseEvent) {
-          if (!mouseEvent.isPrimaryButtonDown()) {
-            getScene().setCursor(Cursor.DEFAULT);
-          }
-        }
-      });
-    }
-
-    // records relative x and y co-ordinates.
-    private class Delta { double x, y; }
-  }
+  
 }

@@ -20,14 +20,20 @@ import javafx.scene.layout.*;
 public class AI_PROJ1 extends Application {
 
   public static void main(String[] args) throws Exception { launch(args); }
-    static Polygon vtriangle = new Polygon();
-    static Polygon triangle = createFirstPolygon();
+    static Polygon vpoly1 = new Polygon();
+    static Polygon vpoly2 = new Polygon();
+    static Polygon vpoly3 = new Polygon();
+    
+    static Polygon poly1 = createFirstPolygon();
+    static Polygon poly2 = createSecondPolygon();
+    static Polygon poly3 = createThirdPolygon();
+
     static double a = 20.0;
     // main application layout logic.
 
   @Override public void start(final Stage stage) throws Exception {
 
-    Polygon triangle1 = createSecondTriangle();
+    
     Group root = new Group();
     Button plusbutton = new Button("+");
     Button minusbutton = new Button("-");
@@ -63,29 +69,48 @@ public class AI_PROJ1 extends Application {
     minusbutton.setMaxWidth(Double.MAX_VALUE);
     resetbutton.setMaxWidth(Double.MAX_VALUE);
     calculatebutton.setMaxWidth(Double.MAX_VALUE);
-    //asdas
-    //asdasd
-    hb.getChildren().addAll(plusbutton,minusbutton,resetbutton,calculatebutton);
-    box.getChildren().add(triangle);
-    box.getChildren().addAll(createControlAnchorsFor(triangle.getPoints()));
-    box.getChildren().add(triangle1);
-    box.getChildren().addAll(createControlAnchorsFor(triangle1.getPoints()));
     
-    vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
-    //vtriangle.getPoints().setAll(pointSorter(getConvexHull(shape.getPoints())));
-    vtriangle.setStroke(Color.BLACK);
-    vtriangle.setStrokeWidth(1);
-    vtriangle.setFill(Color.TRANSPARENT);
-    box.getChildren().addAll(vtriangle);
+    hb.getChildren().addAll(plusbutton,minusbutton,resetbutton,calculatebutton);
+    //box.getChildren().add(poly1);
+    //box.getChildren().addAll(createControlAnchorsFor(poly1.getPoints()));
+    //box.getChildren().add(poly2);
+    //box.getChildren().addAll(createControlAnchorsFor(poly2.getPoints()));
+    
+    vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
+    vpoly1.setStroke(Color.BLACK);
+    vpoly1.setStrokeWidth(1);
+    vpoly1.setFill(Color.TRANSPARENT);
+
+    vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
+    vpoly2.setStroke(Color.BLACK);
+    vpoly2.setStrokeWidth(1);
+    vpoly2.setFill(Color.TRANSPARENT);
+
+    vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
+    vpoly3.setStroke(Color.BLACK);
+    vpoly3.setStrokeWidth(1);
+    vpoly3.setFill(Color.TRANSPARENT);
+    
+    box.getChildren().addAll(vpoly1,vpoly2,vpoly3);
+    box.getChildren().addAll(poly1,poly2,poly3);
+    
+    box.getChildren().addAll(createControlAnchorsFor(poly1.getPoints()));
+    box.getChildren().addAll(createControlAnchorsFor(poly2.getPoints()));
+    box.getChildren().addAll(createControlAnchorsFor(poly3.getPoints()));
+    
     vb.getChildren().addAll(hb, box);
     root.getChildren().addAll(vb);
+    
     Scene scene1 = new Scene(root, 1000, 1000, Color.ALICEBLUE);
+    
     scene1.setOnMouseDragged(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
-         vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
+         vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
+         vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
+         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
         }
 	});
-    //root.getChildren().addAll(createControlAnchorsFor(vtriangle.getPoints()));
+    
     stage.setTitle("AI_PROJ1");
     stage.setScene(
     	scene1
@@ -96,17 +121,19 @@ public class AI_PROJ1 extends Application {
     @Override
     public void handle(ActionEvent e){
         a += 1.0;
-        vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
-        
+        vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
+        vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
+        vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
     }
-  }
-  
+}
   class minusButton implements EventHandler<ActionEvent> {
-    @Override
-    public void handle(ActionEvent e){
+    @Override 
+     public void handle(ActionEvent e){
         if(a > 1.1){
         a -= 1.0;
-        vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
+        vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
+        vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
+        vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
         }
     }
   }
@@ -142,7 +169,7 @@ public class AI_PROJ1 extends Application {
     triangle.setFill(Color.BLUE);
     return triangle;
   }
-   private Polygon createSecondTriangle() {
+   private static Polygon createSecondPolygon() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(
         330d, 580d,
@@ -159,6 +186,22 @@ public class AI_PROJ1 extends Application {
     triangle.setFill(Color.BLUE);
     return triangle;
   }
+  private static Polygon createThirdPolygon() {
+    Polygon triangle = new Polygon();
+    triangle.getPoints().setAll(
+        600d, 900d, 
+        730d, 850d,
+        800d, 730d,
+        750d, 630d,
+        580d, 700d,
+        500d, 800d
+    );
+    triangle.setStroke(Color.BLUE);
+    triangle.setStrokeWidth(4);
+    triangle.setStrokeLineCap(StrokeLineCap.ROUND);
+    triangle.setFill(Color.BLUE);
+    return triangle;  
+  } 
   private ObservableList<Double> pointSorter(ObservableList<Double> s){
     double centerX = 0, centerY = 0;
     for(int i = 0; i < s.size(); i+=2){
@@ -288,7 +331,7 @@ public class AI_PROJ1 extends Application {
         }
       });
 
-      anchors.add(new Anchor(Color.BLACK, xProperty, yProperty));
+      anchors.add(new Anchor(Color.BLUE, xProperty, yProperty));
     }
 
     return anchors;

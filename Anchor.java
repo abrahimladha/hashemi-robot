@@ -19,10 +19,10 @@ public class Anchor extends Circle {
     private final DoubleProperty x, y;
 
     Anchor(Color color, DoubleProperty x, DoubleProperty y) {
-      super(x.get(), y.get(), 10);
+      super(x.get(), y.get(), 3);
       setFill(color);
       setStroke(color);
-      setStrokeWidth(3);
+      setStrokeWidth(1);
       setStrokeType(StrokeType.OUTSIDE);
 
       this.x = x;

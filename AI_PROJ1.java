@@ -28,12 +28,15 @@ public class AI_PROJ1 extends Application {
     static Polygon poly2 = createSecondPolygon();
     static Polygon poly3 = createThirdPolygon();
 
-    static double a = 20.0;
+    static double a = 30.0;
+    
+    static Polygon robit = drawRobit(a);
+    static Polygon goal = new Polygon();
     // main application layout logic.
 
   @Override public void start(final Stage stage) throws Exception {
-
-    
+    goal.getPoints().setAll(1000d, 1000d, 1000d, 950d, 950d, 950d, 950d, 1000d);
+    goal.setFill(Color.RED); 
     Group root = new Group();
     Button plusbutton = new Button("+");
     Button minusbutton = new Button("-");
@@ -93,7 +96,7 @@ public class AI_PROJ1 extends Application {
     
     box.getChildren().addAll(vpoly1,vpoly2,vpoly3);
     box.getChildren().addAll(poly1,poly2,poly3);
-    
+    box.getChildren().addAll(robit,goal);
     box.getChildren().addAll(createControlAnchorsFor(poly1.getPoints()));
     box.getChildren().addAll(createControlAnchorsFor(poly2.getPoints()));
     box.getChildren().addAll(createControlAnchorsFor(poly3.getPoints()));
@@ -124,6 +127,8 @@ public class AI_PROJ1 extends Application {
         vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
         vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
+        robit.getPoints().setAll(drawRobit(a).getPoints());
+    
     }
 }
   class minusButton implements EventHandler<ActionEvent> {
@@ -134,13 +139,49 @@ public class AI_PROJ1 extends Application {
         vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
         vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
+        robit.getPoints().setAll(drawRobit(a).getPoints());
         }
     }
   }
  class resetButton implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e){
-        
+       a = 30.0;
+       poly1.getPoints().setAll(
+          400d, 150d,
+          500d, 200d, 
+          550d, 300d,
+          540d, 400d,
+          480d, 480d,
+          370d, 420d,
+          320d, 330d,
+          350d, 240d
+    );
+       poly2.getPoints().setAll(
+          330d, 580d,
+          200d, 600d,
+          150d, 700d, 
+          110d, 830d, 
+          280d, 840d, 
+          370d, 680d
+     );
+       poly3.getPoints().setAll(
+          600d, 900d,
+          730d, 850d,
+          800d, 730d,
+          750d, 630d,
+          580d, 700d,
+          500d, 800d
+     );
+       robit.getPoints().setAll(
+          (double)(1.0 + 0.5*a), 1.0,
+          1.0,(double)(1.0 + .866*a), 
+          (double)(1.0 + a), (double)(1.0 + .866*a) 
+     );
+        vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
+        vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
+        vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
+
     }
   }
 
@@ -150,7 +191,18 @@ public class AI_PROJ1 extends Application {
     
     }
  }
-
+   private static Polygon drawRobit(double a) {
+    double corner = 1.0;
+   Polygon robit = new Polygon();
+   robit.getPoints().setAll(
+           (double)(corner + 0.5*a), corner,
+           corner,(double)(corner + .866*a), 
+           (double)(corner + a), (double)(corner + .866*a) 
+           );
+   robit.setStroke(Color.RED);
+   robit.setFill(Color.YELLOW);
+   return robit;
+   }
    private static Polygon createFirstPolygon() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(

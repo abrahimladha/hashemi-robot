@@ -32,7 +32,11 @@ public class AI_PROJ1 extends Application {
     
     static Polygon robit = drawRobit(a);
     static Polygon goal = new Polygon();
-    // main application layout logic.
+
+    static ArrayList<Point2D> vertices = new ArrayList<>();
+    static ArrayList<Polyline> edges = new ArrayList<>();
+
+    static HashSet<Polyline> visibles = new HashSet<>();
 
   @Override public void start(final Stage stage) throws Exception {
     goal.getPoints().setAll(1000d, 1000d, 1000d, 950d, 950d, 950d, 950d, 1000d);
@@ -105,7 +109,12 @@ public class AI_PROJ1 extends Application {
     root.getChildren().addAll(vb);
     
     Scene scene1 = new Scene(root, 1000, 1000, Color.ALICEBLUE);
-    
+    //vpoly1.getPoints().setAll(pointSorter(vpoly1.getPoints()));
+    //vpoly2.getPoints().setAll(pointSorter(vpoly2.getPoints()));
+    //vpoly3.getPoints().setAll(pointSorter(vpoly3.getPoints()));
+    generateLists();
+    System.out.println(edges.size());
+    System.out.println(vertices.size());
     scene1.setOnMouseDragged(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
          vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
@@ -113,7 +122,12 @@ public class AI_PROJ1 extends Application {
          vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
         }
 	});
-    
+    generateVisibles();
+    for(Polyline path : edges){
+        path.setStrokeWidth(1);
+        path.setFill(Color.GREEN);
+        root.getChildren().addAll(path);
+    }   
     stage.setTitle("AI_PROJ1");
     stage.setScene(
     	scene1
@@ -191,6 +205,62 @@ public class AI_PROJ1 extends Application {
     
     }
  }
+private boolean linesIntersect(Point2D p1, Point2D p2, Point2D p3, Point2D p4) {
+    double den = ( (p4.getX() - p3.getX()) * (p1.getY() - p2.getY()) - (p1.getX() - p2.getX()) * (p4.getY() - p3.getY()) );
+    double x = ( (p3.getY() - p4.getY()) * (p1.getX() - p3.getX()) + (p4.getX() - p3.getX()) * (p1.getY() - p3.getY()) ) / den;
+    double y = ( (p1.getY() - p2.getY()) * (p1.getX() - p3.getX()) + (p2.getX() - p1.getX()) * (p1.getY() - p3.getY()) ) / den;
+    return ((0d <= x) && (x <= 1d)) && ((0d <= y) && (y <= 1d));
+    }
+   private void generateVisibles(){
+   ArrayList<Polyline> listofallcombos = new ArrayList<>();
+   for(int i = 0; i < vertices.size(); i++){
+    for(int j = i; j< vertices.size(); j++){
+        if(i != j){
+            Polyline pl = new Polyline();
+            pl.getPoints().setAll(new Double[]{
+               vertices.get(i).getX(),vertices.get(i).getY(),
+               vertices.get(j).getX(),vertices.get(j).getY()
+            });
+            listofallcombos.add(pl);
+        }
+    }
+   }
+    for(Polyline edge1 : listofallcombos){
+        boolean collides = false;
+        for(Polyline side : edges){
+            Point2D p1 = new Point2D(edge1.getPoints().get(0),edge1.getPoints().get(1));
+            Point2D p2 = new Point2D(edge1.getPoints().get(2),edge1.getPoints().get(3));
+            Point2D p3 = new Point2D(side.getPoints().get(0),side.getPoints().get(1));
+            Point2D p4 = new Point2D(side.getPoints().get(2),side.getPoints().get(1));            
+            if(linesIntersect(p1,p2,p3,p4)){
+            collides = true;
+            }
+            
+        if(collides){
+            visibles.add(edge1);    
+        }
+        }
+    }
+
+
+   }
+   private void generateLists(){
+    vertices.clear();
+    edges.clear();
+    for(int i = 0; i < vpoly1.getPoints().size(); i+=2){
+    vertices.add(new Point2D(vpoly1.getPoints().get(i),vpoly1.getPoints().get(i+1)));
+    edges.add(new Polyline(vpoly1.getPoints().get(i), vpoly1.getPoints().get(i+1), vpoly1.getPoints().get((i+2)%vpoly1.getPoints().size()), vpoly1.getPoints().get((i+3)%vpoly1.getPoints().size())));
+    }
+    for(int j = 0; j < vpoly2.getPoints().size(); j+=2){
+    vertices.add(new Point2D(vpoly2.getPoints().get(j),vpoly2.getPoints().get(j+1)));
+    edges.add(new Polyline(vpoly2.getPoints().get(j), vpoly2.getPoints().get(j+1), vpoly2.getPoints().get((j+2)%vpoly2.getPoints().size()), vpoly2.getPoints().get((j+3)%vpoly2.getPoints().size())));
+    }
+    for(int k = 0; k < vpoly3.getPoints().size(); k+=2){
+    vertices.add(new Point2D(vpoly3.getPoints().get(k),vpoly3.getPoints().get(k+1)));
+    edges.add(new Polyline(vpoly3.getPoints().get(k), vpoly3.getPoints().get(k+1), vpoly3.getPoints().get((k+2)%vpoly3.getPoints().size()), vpoly3.getPoints().get((k+3)%vpoly3.getPoints().size())));
+    }
+
+   }
    private static Polygon drawRobit(double a) {
     double corner = 1.0;
    Polygon robit = new Polygon();

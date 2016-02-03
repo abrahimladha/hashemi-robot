@@ -29,8 +29,10 @@ public class AI_PROJ1 extends Application {
     static Polygon poly3 = createThirdPolygon();
     
     static Polygon error1 = new Polygon();
+    static Polygon error2 = new Polygon();
+    static Polygon error3 = new Polygon();
+
     static double a = 30.0;
-    static double b = a * 0.9;
     static Polygon robit = drawRobit(a);
     static Polygon goal = new Polygon();
 
@@ -38,7 +40,7 @@ public class AI_PROJ1 extends Application {
     static ArrayList<Polyline> edges = new ArrayList<>();
 
     static ArrayList<Polyline> visibles = new ArrayList<>();
-    static Shape temp1;
+    
     static Group root = new Group();
   @Override public void start(final Stage stage) throws Exception {
     goal.getPoints().setAll(1000d, 1000d, 1000d, 950d, 950d, 950d, 950d, 1000d);
@@ -101,8 +103,9 @@ public class AI_PROJ1 extends Application {
     vpoly3.setFill(Color.TRANSPARENT);
 
     error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
-    //error.setStrokt(Color.BLACK);
-    //error.setFill(Color.TRANSPARENT);
+    error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
+    error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
+
     box.getChildren().addAll(vpoly1,vpoly2,vpoly3);
     box.getChildren().addAll(poly1,poly2,poly3);
     box.getChildren().addAll(robit,goal);
@@ -126,9 +129,10 @@ public class AI_PROJ1 extends Application {
          vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
          vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
          error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
+         error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
+         error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
         }
 	});
-    temp1 = Shape.union(vpoly1,poly1);  
     stage.setTitle("AI_PROJ1");
     stage.setScene(
     	scene1
@@ -144,6 +148,9 @@ public class AI_PROJ1 extends Application {
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
         
         error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
+        error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
+        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
+        
         robit.getPoints().setAll(drawRobit(a).getPoints());
     
     }
@@ -158,6 +165,9 @@ public class AI_PROJ1 extends Application {
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
         
         error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
+        error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
+        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
+
         robit.getPoints().setAll(drawRobit(a).getPoints());
         }
     }
@@ -200,7 +210,9 @@ public class AI_PROJ1 extends Application {
         vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
         vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
-
+        error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
+        error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
+        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
     }
   }
 
@@ -211,34 +223,40 @@ public class AI_PROJ1 extends Application {
         //generateLists();
         //generateVisibles();
         //Shape temp1 = Shape.union(vpoly1,poly1);
-        setVis(vpoly2.getPoints().get(0),vpoly2.getPoints().get(1));
+        for(int i = 0; i < vpoly2.getPoints().size(); i+=2)
+            setVis(vpoly2.getPoints().get(i),vpoly2.getPoints().get(i+1),vpoly1);
+        for(int j = 0; j < vpoly3.getPoints().size(); j+=2)
+            setVis(vpoly3.getPoints().get(j),vpoly3.getPoints().get(j+1),vpoly2);
+        for(int k = 0; k < vpoly3.getPoints().size(); k+=2)
+            setVis(vpoly3.getPoints().get(k),vpoly3.getPoints().get(k+1),vpoly1);
         for(Polyline path : visibles){
         root.getChildren().addAll(path);     
         }
     }
  }
 
-private static void setVis(double x, double y){
+private static void setVis(double x, double y, Polygon poly){
     System.out.println("start");
-    for(int i = 0; i < vpoly1.getPoints().size(); i+=2){
+    for(int i = 0; i < poly.getPoints().size(); i+=2){
         Polygon triangle = new Polygon();
         triangle.getPoints().setAll(
                 x,y,
-                vpoly1.getPoints().get(i),
-                vpoly1.getPoints().get(i+1),
-                vpoly1.getPoints().get((i+2)%vpoly1.getPoints().size()),
-                vpoly1.getPoints().get((i+3)%vpoly1.getPoints().size())
+                poly.getPoints().get(i),
+                poly.getPoints().get(i+1),
+                poly.getPoints().get((i+2)%poly.getPoints().size()),
+                poly.getPoints().get((i+3)%poly.getPoints().size())
         );
         System.out.println("before if");
-        //Shape half = Shape.union(vpoly1,poly1);
-        Shape inter = Shape.intersect(error1,triangle);
+        Shape totalError = Shape.union(error1,error2);
+        totalError = Shape.union(error3,totalError);
+        Shape inter = Shape.intersect(totalError,triangle);
         if(inter.getLayoutBounds().getHeight() <= 0 || inter.getLayoutBounds().getWidth() <= 0){
           //if(triangle.getBoundsInLocal().contains(vpoly1.getBoundsInLocal())){  
             Polyline one = new Polyline();
             Polyline two = new Polyline();
-            one.getPoints().setAll(x,y,vpoly1.getPoints().get(i),vpoly1.getPoints().get(i+1));
-            two.getPoints().setAll(x,y,vpoly1.getPoints().get((i+2)%vpoly1.getPoints().size()),
-                    vpoly1.getPoints().get((i+3)%vpoly1.getPoints().size()));
+            one.getPoints().setAll(x,y,poly.getPoints().get(i),poly.getPoints().get(i+1));
+            two.getPoints().setAll(x,y,poly.getPoints().get((i+2)%poly.getPoints().size()),
+                    poly.getPoints().get((i+3)%poly.getPoints().size()));
             System.out.println(visibles.size());
 
             visibles.add(one);

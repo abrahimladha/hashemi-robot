@@ -42,8 +42,22 @@ public class AI_PROJ1 extends Application {
     static ArrayList<Polyline> visibles = new ArrayList<>();
     
     static Group root = new Group();
-  @Override public void start(final Stage stage) throws Exception {
-    goal.getPoints().setAll(1000d, 1000d, 1000d, 950d, 950d, 950d, 950d, 1000d);
+  
+    static PriorityQueue<Node> openList;
+    static ArrayList<Node> closedList;
+    static HashMap<Node, Double> gVals = new HashMap<Node, Double>();
+    static HashMap<Node, Double> fVals = new HashMap<Node, Double>();
+    @Override public void start(final Stage stage) throws Exception {
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        goal.getPoints().setAll(1000d, 1000d, 1000d, 950d, 950d, 950d, 950d, 1000d);
     goal.setFill(Color.RED); 
     // Group root = new Group();
     Button plusbutton = new Button("+");
@@ -230,11 +244,82 @@ public class AI_PROJ1 extends Application {
         for(int k = 0; k < vpoly3.getPoints().size(); k+=2)
             setVis(vpoly3.getPoints().get(k),vpoly3.getPoints().get(k+1),vpoly1);
         for(Polyline path : visibles){
-        root.getChildren().addAll(path);     
+            path.setStroke(Color.LIGHTGRAY);
+            root.getChildren().addAll(path);     
         }
     }
  }
+//private static void getVisible(Point2D p){
+//}
+public void traverse(Node start, Node end){
+    openList.clear();
+    closedList.clear();
+    gVals.put(start, 0.0);
+    openList.add(start);
 
+    while(!openList.isEmpty()) {
+        Node current = openList.element();
+        if (current.equals(end)) {
+            System.out.println("Goal Reached!");
+            printPath(current);
+            return;
+        }
+        closedList.add(openList.poll());
+        ArrayList<Node> neighbors = current.getNeighbors();
+        for (Node neighbor : neighbors) {
+            double gScore = gVals.get(current) + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
+            double fScore = gScore + h(neighbor, current);
+
+            if(closedList.contains(neighbor)) {
+                if(gVals.get(neighbor) == null) {
+                    gVals.put(neighbor,fScore);
+                }
+                if(fVals.get(neighbor) == null) {
+                    fVals.put(neighbor,fScore);
+                }
+                if(fScore >= fVals.get(neighbor)) {
+                    continue;
+                }
+            }
+            if (!openList.contains(neighbor) || fScore < fVals.get(neighbor)) {
+                neighbor.setParent(current);
+                gVals.put(neighbor, gScore);
+                fVals.put(neighbor, fScore);
+                if(!openList.contains(neighbor)) {
+                    openList.add(neighbor);
+                }
+            }
+        }
+    }
+    System.out.println("FAIL");
+}
+public double EuclideanDistance(double x1, double y1, double x2, double y2){
+    return Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2 - y1,2));
+}
+private double h(Node node, Node goal) {
+    double x = node.getX() - goal.getX();
+    double y = node.getY()- goal.getY();
+    return x*x + y*y;
+}
+public void printPath(Node node) {
+    System.out.println(node.getData());
+    while (node.getParent() != null) {
+        node = node.getParent();
+        System.out.println(node.getData());
+    }
+}
+class fCompare implements Comparator<Node> {
+    public int compare(Node o1, Node o2) {
+        if(fVals.get(o1) < fVals.get(o2)) {
+            return -1;
+        }
+        else if(fVals.get(o1) > fVals.get(o2)) {
+        return 1;
+        }
+        else
+            return -1;
+    }
+}
 private static void setVis(double x, double y, Polygon poly){
     System.out.println("start");
     for(int i = 0; i < poly.getPoints().size(); i+=2){

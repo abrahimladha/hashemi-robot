@@ -249,8 +249,7 @@ public class AI_PROJ1 extends Application {
         }
     }
  }
-//private static void getVisible(Point2D p){
-//}
+
 public void traverse(Node start, Node end){
     openList.clear();
     closedList.clear();
@@ -320,8 +319,35 @@ class fCompare implements Comparator<Node> {
             return -1;
     }
 }
+private static ArrayList<Node> whatsVisible(double x, double y){
+    ArrayList<Node> childs = new ArrayList<>();
+    for(int i = 0; i < vpoly1.getPoints().size(); i+=2){
+        Polygon triangle = new Polygon();
+        triangle.getPoints().setAll(
+                x,y,
+                vpoly1.getPoints().get(i),
+                vpoly1.getPoints().get(i+1),
+                vpoly1.getPoints().get((i+2)%vpoly1.getPoints().size()),
+                vpoly1.getPoints().get((i+3)%vpoly1.getPoints().size())
+        );
+        Shape totalError = Shape.union(error1,error2);
+        totalError = Shape.union(totalError,triangle);
+        Shape inter = Shape.intersect(totalError,triangle);
+        if(inter.getLayoutBounds().getHeight() <= 0 || inter.getLayoutBounds().getHeight() <= 0){
+            Node one = new Node(vpoly1.getPoints().get(i),vpoly1.getPoints().get(i+1));
+            Node two = new Node(vpoly1.getPoints().get((i+2)%vpoly1.getPoints().size()),vpoly1.getPoints().get((i+3)%vpoly1.getPoints().size()));
+            if(!childs.contains(one))
+                childs.add(one);
+            if(!childs.contains(two))
+                childs.add(two);
+        }
+    
+    
+    
+    }
+    return childs;
+}
 private static void setVis(double x, double y, Polygon poly){
-    System.out.println("start");
     for(int i = 0; i < poly.getPoints().size(); i+=2){
         Polygon triangle = new Polygon();
         triangle.getPoints().setAll(

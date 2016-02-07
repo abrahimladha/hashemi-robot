@@ -275,7 +275,8 @@ public class AI_PROJ1 extends Application {
         nodes.add(startnode);
         nodes.add(endnode);
         for(int w = 0; w < nodes.size(); w++){
-            for(Node temp : whatsVisible(nodes.get(w).getX(),nodes.get(w).getY()))
+            ArrayList<Node> thing = whatsVisible(nodes.get(w).getX(),nodes.get(w).getY());
+            for(Node temp : thing)    
                 nodes.get(w).addNeighbor(temp);
                     //nodes.get(w).setNeighbors(whatsVisible(nodes.get(w).getX(),nodes.get(w).getY()));
             
@@ -306,12 +307,12 @@ public void traverse(Node begin, Node end) {
     closedList.clear();
     //fVals.clear();
     //gVals.clear();
-    gVals.put(begin, 0.0);
+    gVals.put(begin,0.0);
     openList.add(begin);
-    Node current;
-    fVals.put(begin,h(begin,end)); 
+    
+    fVals.put(begin,Math.sqrt(h(begin,end))); 
     while(!openList.isEmpty()) {
-       current = openList.element();
+      Node current = openList.element();
         System.out.println(openList.size());    
        if (current.equals(end)) {
             System.out.println("Goal Reached!");
@@ -329,10 +330,10 @@ public void traverse(Node begin, Node end) {
         for (Node neighbor : neighbors) {
             
             double gScore = gVals.get(current) + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
-            double fScore = gScore + h(neighbor, current);
+            double fScore = gScore + Math.sqrt(h(neighbor, end));
             System.out.println(neighbors);
             System.out.println(closedList);
-           // if(closedList.contains(neighbor)) {
+            if(closedList.contains(neighbor)) {
                 System.out.println("contains");
                 if(gVals.get(neighbor) == null) {
                     gVals.put(neighbor, gScore);
@@ -340,7 +341,7 @@ public void traverse(Node begin, Node end) {
                 if(fVals.get(neighbor) == null) {
                     fVals.put(neighbor, fScore);
                 }
-                if(closedList.contains(neighbor)){
+            //    if(closedList.contains(neighbor)){
                 if(fScore >= fVals.get(neighbor)) {
                     continue;
                 }
@@ -354,6 +355,22 @@ public void traverse(Node begin, Node end) {
                     System.out.println("added");
                 }
             }
+            /*
+            if(closedList.contains(neighbor)) {
+                continue;
+            }
+            double gScore = gVals.get(current) + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
+            if(!openList.contains(neighbor)){
+                openList.add(neighbor);
+            }
+            else if(gScore >= gVals.get(neighbor)){
+                continue;
+            }
+
+            neighbor.setParent(current);
+            gVals.put(neighbor,gScore);
+            double fScore = gScore + h(neighbor,end);
+            fVals.put(neighbor,fScore);*/
         }
     }
     System.out.println("FAIL");
@@ -364,7 +381,7 @@ public double EuclideanDistance(double x1, double y1, double x2, double y2){
 public double h(Node node, Node goal) {
     double x = node.getX() - goal.getX();
     double y = node.getY()- goal.getY();
-    return x*x + y*y;
+    return x*x +y*y;
 }
 public void printPath(Node node) {
     System.out.println(node.getData());
@@ -382,7 +399,7 @@ class fCompare implements Comparator<Node> {
         return 1;
         }
         else
-            return -1;
+            return 0;
     }
 }
 private static ArrayList<Node> whatsVisible(double x, double y){

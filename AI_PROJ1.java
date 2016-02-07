@@ -42,11 +42,16 @@ public class AI_PROJ1 extends Application {
     static ArrayList<Polyline> visibles = new ArrayList<>();
     
     static Group root = new Group();
-  
+    static Group possiblepaths = new Group();
     static PriorityQueue<Node> openList;
     static ArrayList<Node> closedList;
-    static HashMap<Node, Double> gVals = new HashMap<Node, Double>();
-    static HashMap<Node, Double> fVals = new HashMap<Node, Double>();
+    HashMap<Node, Double> gVals = new HashMap<>();
+    HashMap<Node, Double> fVals = new HashMap<>();
+    
+    static ArrayList<Node> nodes = new ArrayList<>();
+    
+    
+    
     @Override public void start(final Stage stage) throws Exception {
         
         
@@ -126,17 +131,12 @@ public class AI_PROJ1 extends Application {
     box.getChildren().addAll(createControlAnchorsFor(poly1.getPoints()));
     box.getChildren().addAll(createControlAnchorsFor(poly2.getPoints()));
     box.getChildren().addAll(createControlAnchorsFor(poly3.getPoints()));
-    
+    box.getChildren().addAll(possiblepaths);
     vb.getChildren().addAll(box, hb);
     root.getChildren().addAll(vb);
     
     Scene scene1 = new Scene(root, 1080, 1080, Color.ALICEBLUE);
-    //vpoly1.getPoints().setAll(pointSorter(vpoly1.getPoints()));
-    //vpoly2.getPoints().setAll(pointSorter(vpoly2.getPoints()));
-    //vpoly3.getPoints().setAll(pointSorter(vpoly3.getPoints()));
-    //generateLists();
-    System.out.println(edges.size());
-    System.out.println(vertices.size());
+
     scene1.setOnMouseDragged(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
          vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
@@ -234,25 +234,78 @@ public class AI_PROJ1 extends Application {
     @Override
     public void handle(ActionEvent e){
         visibles.clear();
-        //generateLists();
-        //generateVisibles();
-        //Shape temp1 = Shape.union(vpoly1,poly1);
-        for(int i = 0; i < vpoly2.getPoints().size(); i+=2)
+        possiblepaths.getChildren().removeAll();
+        
+
+
+
+        for(int i = 0; i < vpoly2.getPoints().size(); i+=2){
             setVis(vpoly2.getPoints().get(i),vpoly2.getPoints().get(i+1),vpoly1);
-        for(int j = 0; j < vpoly3.getPoints().size(); j+=2)
+            int size2 = vpoly2.getPoints().size();
+            Node n = new Node(vpoly2.getPoints().get(i),vpoly2.getPoints().get(i+1));
+            Node next = new Node(vpoly2.getPoints().get((i+2)%size2),vpoly2.getPoints().get((i+3)%size2));
+            Node prev = new Node(vpoly2.getPoints().get((i+size2 -2)%size2),vpoly2.getPoints().get((i-1 + size2)%size2));
+            n.addNeighbor(next);
+            n.addNeighbor(prev);
+            nodes.add(n);
+        
+        }
+        for(int j = 0; j < vpoly3.getPoints().size(); j+=2){
             setVis(vpoly3.getPoints().get(j),vpoly3.getPoints().get(j+1),vpoly2);
-        for(int k = 0; k < vpoly3.getPoints().size(); k+=2)
-            setVis(vpoly3.getPoints().get(k),vpoly3.getPoints().get(k+1),vpoly1);
+            int size3 = vpoly3.getPoints().size();
+            Node n = new Node(vpoly3.getPoints().get(j),vpoly3.getPoints().get(j+1));
+            Node next = new Node(vpoly3.getPoints().get((j+2)%size3),vpoly3.getPoints().get((j+3)%size3));
+            Node prev = new Node(vpoly3.getPoints().get((j+size3-2)%size3),vpoly3.getPoints().get((j+size3-1)%size3));
+            n.addNeighbor(next);
+            n.addNeighbor(prev);
+            nodes.add(n);
+        }
+        for(int k = 0; k < vpoly1.getPoints().size(); k+=2){
+            setVis(vpoly1.getPoints().get(k),vpoly1.getPoints().get(k+1),vpoly3);
+            int size1 = vpoly1.getPoints().size();
+            Node n = new Node(vpoly1.getPoints().get(k),vpoly1.getPoints().get(k+1));
+            Node next = new Node(vpoly1.getPoints().get((k+2)%size1),vpoly1.getPoints().get((k+3)%size1));
+            Node prev = new Node(vpoly1.getPoints().get((k+size1-2)%size1),vpoly1.getPoints().get((k+size1-1)%size1));
+            n.addNeighbor(next);
+            n.addNeighbor(prev);
+            nodes.add(n);
+        }
+        Node startnode = new Node(robit.getPoints().get(4),robit.getPoints().get(5));
+        Node endnode = new Node(goal.getPoints().get(4),goal.getPoints().get(5));
+        nodes.add(startnode);
+        nodes.add(endnode);
+        for(int w = 0; w < nodes.size(); w++){
+            for(Node temp : whatsVisible(nodes.get(w).getX(),nodes.get(w).getY()))
+                nodes.get(w).addNeighbor(temp);
+                    //nodes.get(w).setNeighbors(whatsVisible(nodes.get(w).getX(),nodes.get(w).getY()));
+            
+        }
         for(Polyline path : visibles){
             path.setStroke(Color.LIGHTGRAY);
-            root.getChildren().addAll(path);     
+            possiblepaths.getChildren().addAll(path);     
         }
+        
+        System.out.println(nodes.size()); 
+        for(Node tempnode : nodes){
+            System.out.println("a" + tempnode.getNeighbors().size());
+            tempnode.setData(tempnode.getX() + "  " + tempnode.getY());
+        }
+            //traverse(startnode,endnode);
+        //System.out.println(nodes.get(0).getX() + "  " + nodes.get(0).getY());
+        traverse(nodes.get(5),nodes.get(6));
+    
+    
     }
  }
 
-public void traverse(Node start, Node end){
+private void traverse(Node start, Node end) {
+    openList = new PriorityQueue<Node>(1000, new fCompare());
+    closedList = new ArrayList<>();
     openList.clear();
+    //openList = new
     closedList.clear();
+    //fVals.clear();
+    //gVals.clear();
     gVals.put(start, 0.0);
     openList.add(start);
 
@@ -264,14 +317,21 @@ public void traverse(Node start, Node end){
             return;
         }
         closedList.add(openList.poll());
+        
         ArrayList<Node> neighbors = current.getNeighbors();
+        
+        
+        System.out.println("a");
         for (Node neighbor : neighbors) {
+            System.out.println(neighbors.size());
             double gScore = gVals.get(current) + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
             double fScore = gScore + h(neighbor, current);
-
-            if(closedList.contains(neighbor)) {
+            System.out.println(neighbor);
+            System.out.println(closedList);
+            if(closedList.indexOf(neighbor) != -1) {
+                System.out.println("contains");
                 if(gVals.get(neighbor) == null) {
-                    gVals.put(neighbor,fScore);
+                    gVals.put(neighbor,gScore);
                 }
                 if(fVals.get(neighbor) == null) {
                     fVals.put(neighbor,fScore);
@@ -286,6 +346,7 @@ public void traverse(Node start, Node end){
                 fVals.put(neighbor, fScore);
                 if(!openList.contains(neighbor)) {
                     openList.add(neighbor);
+                    System.out.println("added");
                 }
             }
         }
@@ -293,9 +354,9 @@ public void traverse(Node start, Node end){
     System.out.println("FAIL");
 }
 public double EuclideanDistance(double x1, double y1, double x2, double y2){
-    return Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2 - y1,2));
+   return Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2 - y1,2));
 }
-private double h(Node node, Node goal) {
+public double h(Node node, Node goal) {
     double x = node.getX() - goal.getX();
     double y = node.getY()- goal.getY();
     return x*x + y*y;
@@ -321,6 +382,7 @@ class fCompare implements Comparator<Node> {
 }
 private static ArrayList<Node> whatsVisible(double x, double y){
     ArrayList<Node> childs = new ArrayList<>();
+    ArrayList<Polygon> triangles = new ArrayList<>();
     for(int i = 0; i < vpoly1.getPoints().size(); i+=2){
         Polygon triangle = new Polygon();
         triangle.getPoints().setAll(
@@ -330,20 +392,42 @@ private static ArrayList<Node> whatsVisible(double x, double y){
                 vpoly1.getPoints().get((i+2)%vpoly1.getPoints().size()),
                 vpoly1.getPoints().get((i+3)%vpoly1.getPoints().size())
         );
+        triangles.add(triangle);
+    }
+    for(int i = 0; i < vpoly2.getPoints().size(); i+=2){
+       Polygon triangle = new Polygon();
+       triangle.getPoints().setAll(
+                x,y,
+                vpoly2.getPoints().get(i),
+                vpoly2.getPoints().get(i+1),
+                vpoly2.getPoints().get((i+2)%vpoly2.getPoints().size()),
+                vpoly2.getPoints().get((i+3)%vpoly2.getPoints().size())
+        );
+        triangles.add(triangle);
+    }
+    for(int i = 0; i < vpoly1.getPoints().size(); i+=2){
+        Polygon triangle = new Polygon();
+        triangle.getPoints().setAll(
+                x,y,
+                vpoly1.getPoints().get(i),
+                vpoly1.getPoints().get(i+1),
+                vpoly1.getPoints().get((i+2)%vpoly1.getPoints().size()),
+                vpoly1.getPoints().get((i+3)%vpoly1.getPoints().size())
+       );
+       triangles.add(triangle);
+    }
         Shape totalError = Shape.union(error1,error2);
-        totalError = Shape.union(totalError,triangle);
-        Shape inter = Shape.intersect(totalError,triangle);
+        totalError = Shape.union(totalError,error3);
+    for(Polygon tri : triangles){   
+        Shape inter = Shape.intersect(totalError,tri);
         if(inter.getLayoutBounds().getHeight() <= 0 || inter.getLayoutBounds().getHeight() <= 0){
-            Node one = new Node(vpoly1.getPoints().get(i),vpoly1.getPoints().get(i+1));
-            Node two = new Node(vpoly1.getPoints().get((i+2)%vpoly1.getPoints().size()),vpoly1.getPoints().get((i+3)%vpoly1.getPoints().size()));
+            Node one = new Node(tri.getPoints().get(2),tri.getPoints().get(3));
+            Node two = new Node(tri.getPoints().get(4),tri.getPoints().get(5));
             if(!childs.contains(one))
                 childs.add(one);
             if(!childs.contains(two))
                 childs.add(two);
         }
-    
-    
-    
     }
     return childs;
 }
@@ -357,7 +441,6 @@ private static void setVis(double x, double y, Polygon poly){
                 poly.getPoints().get((i+2)%poly.getPoints().size()),
                 poly.getPoints().get((i+3)%poly.getPoints().size())
         );
-        System.out.println("before if");
         Shape totalError = Shape.union(error1,error2);
         totalError = Shape.union(error3,totalError);
         Shape inter = Shape.intersect(totalError,triangle);
@@ -368,13 +451,11 @@ private static void setVis(double x, double y, Polygon poly){
             one.getPoints().setAll(x,y,poly.getPoints().get(i),poly.getPoints().get(i+1));
             two.getPoints().setAll(x,y,poly.getPoints().get((i+2)%poly.getPoints().size()),
                     poly.getPoints().get((i+3)%poly.getPoints().size()));
-            System.out.println(visibles.size());
+            //System.out.println(visibles.size());
 
             visibles.add(one);
             visibles.add(two);
         }
-        else
-            System.out.println("in else");
         
     }
 

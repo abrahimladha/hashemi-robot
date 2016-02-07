@@ -47,7 +47,7 @@ public class AI_PROJ1 extends Application {
     static ArrayList<Node> closedList;
     HashMap<Node, Double> gVals = new HashMap<>();
     HashMap<Node, Double> fVals = new HashMap<>();
-    
+    static ArrayList<Node> allnodes = new ArrayList<>();
     static ArrayList<Node> nodes = new ArrayList<>();
     
     
@@ -272,12 +272,15 @@ public class AI_PROJ1 extends Application {
         }
         Node startnode = new Node(robit.getPoints().get(4),robit.getPoints().get(5));
         Node endnode = new Node(goal.getPoints().get(4),goal.getPoints().get(5));
-        nodes.add(startnode);
-        nodes.add(endnode);
-        for(int w = 0; w < nodes.size(); w++){
-            ArrayList<Node> thing = whatsVisible(nodes.get(w).getX(),nodes.get(w).getY());
+       // nodes.add(startnode);
+       // nodes.add(endnode);
+        darnNodeFiller();
+        allnodes.add(startnode);
+        allnodes.add(endnode);
+        for(int w = 0; w < allnodes.size(); w++){
+            ArrayList<Node> thing = whatsVisible(allnodes.get(w));
             for(Node temp : thing)    
-                nodes.get(w).addNeighbor(temp);
+                allnodes.get(w).addNeighbor(temp);
                     //nodes.get(w).setNeighbors(whatsVisible(nodes.get(w).getX(),nodes.get(w).getY()));
             
         }
@@ -287,18 +290,33 @@ public class AI_PROJ1 extends Application {
         }
         
         System.out.println(nodes.size()); 
-        for(Node tempnode : nodes){
-            System.out.println("neighbors: " + tempnode.getNeighbors().size());
+        for(Node tempnode : allnodes){
             tempnode.setData(tempnode.getX() + "  " + tempnode.getY());
+            for(Node neigh : tempnode.getNeighbors())
+                System.out.println(neigh.getData());
+            System.out.println();
         }
-            //traverse(startnode,endnode);
+        
+        traverse(startnode,endnode);
         //System.out.println(nodes.get(0).getX() + "  " + nodes.get(0).getY());
-        traverse(nodes.get(5),nodes.get(7));
+        //traverse(startnode,endnode);
+        
     
     
     }
  }
+public void darnNodeFiller(){
+    for(int i = 0; i < vpoly1.getPoints().size(); i+=2){
+        allnodes.add(new Node(vpoly1.getPoints().get(i),vpoly1.getPoints().get(i+1)));
+    }
+    for(int i = 0; i < vpoly2.getPoints().size(); i+=2){
+       allnodes.add(new Node(vpoly2.getPoints().get(i),vpoly2.getPoints().get(i+1)));
+    }
+    for(int i = 0; i < vpoly3.getPoints().size(); i+=2){
+       allnodes.add(new Node(vpoly3.getPoints().get(i),vpoly3.getPoints().get(i+1)));
+    }
 
+}
 public void traverse(Node begin, Node end) {
     openList = new PriorityQueue<Node>(1000, new fCompare());
     closedList = new ArrayList<>();
@@ -309,12 +327,13 @@ public void traverse(Node begin, Node end) {
     //gVals.clear();
     gVals.put(begin,0.0);
     openList.add(begin);
-    
-    fVals.put(begin,Math.sqrt(h(begin,end))); 
+     
+    //fVals.put(begin,Math.sqrt(h(begin,end))); 
     while(!openList.isEmpty()) {
       Node current = openList.element();
-        System.out.println(openList.size());    
-       if (current.equals(end)) {
+        //System.out.println(openList.size());    
+        //System.out.println(current.getData());
+        if (current.equals(end)) {
             System.out.println("Goal Reached!");
             printPath(current);
             return;
@@ -325,14 +344,14 @@ public void traverse(Node begin, Node end) {
         
         ArrayList<Node> neighbors = current.getNeighbors();
         //closedList.add(openList.poll());
-        //System.out.println(begin.getNeighbors().size()); 
-        System.out.println("neighbors" + neighbors.size());
+        //System.out.println(neighbors); 
+        //System.out.println("neighbors" + neighbors.size());
         for (Node neighbor : neighbors) {
             
             double gScore = gVals.get(current) + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
-            double fScore = gScore + Math.sqrt(h(neighbor, end));
-            System.out.println(neighbors);
-            System.out.println(closedList);
+            double fScore = gScore + h(neighbor, current);
+         //   System.out.println(neighbors);
+         //   System.out.println(closedList);
             if(closedList.contains(neighbor)) {
                 System.out.println("contains");
                 if(gVals.get(neighbor) == null) {
@@ -350,6 +369,7 @@ public void traverse(Node begin, Node end) {
                 neighbor.setParent(current);
                 gVals.put(neighbor, gScore);
                 fVals.put(neighbor, fScore);
+            
                 if(!openList.contains(neighbor)) {
                     openList.add(neighbor);
                     System.out.println("added");
@@ -402,13 +422,13 @@ class fCompare implements Comparator<Node> {
             return 0;
     }
 }
-private static ArrayList<Node> whatsVisible(double x, double y){
+private static ArrayList<Node> whatsVisible(Node vertex){
     ArrayList<Node> childs = new ArrayList<>();
     ArrayList<Polygon> triangles = new ArrayList<>();
     for(int i = 0; i < vpoly1.getPoints().size(); i+=2){
         Polygon triangle = new Polygon();
         triangle.getPoints().setAll(
-                x,y,
+                vertex.getX(),vertex.getY(),
                 vpoly1.getPoints().get(i),
                 vpoly1.getPoints().get(i+1),
                 vpoly1.getPoints().get((i+2)%vpoly1.getPoints().size()),
@@ -419,7 +439,7 @@ private static ArrayList<Node> whatsVisible(double x, double y){
     for(int i = 0; i < vpoly2.getPoints().size(); i+=2){
        Polygon triangle = new Polygon();
        triangle.getPoints().setAll(
-                x,y,
+                vertex.getX(),vertex.getY(),
                 vpoly2.getPoints().get(i),
                 vpoly2.getPoints().get(i+1),
                 vpoly2.getPoints().get((i+2)%vpoly2.getPoints().size()),
@@ -430,7 +450,7 @@ private static ArrayList<Node> whatsVisible(double x, double y){
     for(int i = 0; i < vpoly3.getPoints().size(); i+=2){
         Polygon triangle = new Polygon();
         triangle.getPoints().setAll(
-                x,y,
+                vertex.getX(),vertex.getY(),
                 vpoly3.getPoints().get(i),
                 vpoly3.getPoints().get(i+1),
                 vpoly3.getPoints().get((i+2)%vpoly3.getPoints().size()),
@@ -445,12 +465,22 @@ private static ArrayList<Node> whatsVisible(double x, double y){
         if(inter.getLayoutBounds().getHeight() <= 0 || inter.getLayoutBounds().getHeight() <= 0){
             Node one = new Node(tri.getPoints().get(2),tri.getPoints().get(3));
             Node two = new Node(tri.getPoints().get(4),tri.getPoints().get(5));
-            if(!childs.contains(one))
-                childs.add(one);
-            if(!childs.contains(two))
-                childs.add(two);
+            int dex1 = allnodes.indexOf(one);
+            int dex2 = allnodes.indexOf(two);
+            for(Node node : allnodes){
+                if(one.equals(node)){
+                    if(!childs.contains(node))
+                        childs.add(node);
+                }
+                if(two.equals(node)){
+                    if(!childs.contains(node))
+                        childs.add(node);
+                }
+            }
         }
     }
+
+    
     return childs;
 }
 private static void setVis(double x, double y, Polygon poly){

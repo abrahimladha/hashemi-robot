@@ -245,9 +245,11 @@ public class AI_PROJ1 extends Application {
             Node n = new Node(vpoly2.getPoints().get(i),vpoly2.getPoints().get(i+1));
             Node next = new Node(vpoly2.getPoints().get((i+2)%size2),vpoly2.getPoints().get((i+3)%size2));
             Node prev = new Node(vpoly2.getPoints().get((i+size2 -2)%size2),vpoly2.getPoints().get((i-1 + size2)%size2));
-            n.addNeighbor(next);
-            n.addNeighbor(prev);
-            nodes.add(n);
+            if(!n.getNeighbors().contains(next))
+                n.addNeighbor(next);
+            if(!n.getNeighbors().contains(prev))
+                n.addNeighbor(prev);
+            allnodes.add(n);
         
         }
         for(int j = 0; j < vpoly3.getPoints().size(); j+=2){
@@ -256,9 +258,11 @@ public class AI_PROJ1 extends Application {
             Node n = new Node(vpoly3.getPoints().get(j),vpoly3.getPoints().get(j+1));
             Node next = new Node(vpoly3.getPoints().get((j+2)%size3),vpoly3.getPoints().get((j+3)%size3));
             Node prev = new Node(vpoly3.getPoints().get((j+size3-2)%size3),vpoly3.getPoints().get((j+size3-1)%size3));
-            n.addNeighbor(next);
-            n.addNeighbor(prev);
-            nodes.add(n);
+            if(!n.getNeighbors().contains(next))
+                n.addNeighbor(next);
+            if(!n.getNeighbors().contains(prev))
+                n.addNeighbor(prev);
+            allnodes.add(n);
         }
         for(int k = 0; k < vpoly1.getPoints().size(); k+=2){
             setVis(vpoly1.getPoints().get(k),vpoly1.getPoints().get(k+1),vpoly3);
@@ -266,21 +270,28 @@ public class AI_PROJ1 extends Application {
             Node n = new Node(vpoly1.getPoints().get(k),vpoly1.getPoints().get(k+1));
             Node next = new Node(vpoly1.getPoints().get((k+2)%size1),vpoly1.getPoints().get((k+3)%size1));
             Node prev = new Node(vpoly1.getPoints().get((k+size1-2)%size1),vpoly1.getPoints().get((k+size1-1)%size1));
-            n.addNeighbor(next);
-            n.addNeighbor(prev);
-            nodes.add(n);
+            if(!n.getNeighbors().contains(next))
+                n.addNeighbor(next);
+            if(!n.getNeighbors().contains(prev))
+                n.addNeighbor(prev);
+            allnodes.add(n);
         }
         Node startnode = new Node(robit.getPoints().get(4),robit.getPoints().get(5));
         Node endnode = new Node(goal.getPoints().get(4),goal.getPoints().get(5));
        // nodes.add(startnode);
        // nodes.add(endnode);
-        darnNodeFiller();
+        //darnNodeFiller();
+        
+        startnode.setNeighbors(whatsVisible(startnode));
+        endnode.setNeighbors(whatsVisible(endnode));
         allnodes.add(startnode);
         allnodes.add(endnode);
         for(int w = 0; w < allnodes.size(); w++){
-            ArrayList<Node> thing = whatsVisible(allnodes.get(w));
-            for(Node temp : thing)    
-                allnodes.get(w).addNeighbor(temp);
+            HashSet<Node> thing = whatsVisible(allnodes.get(w));
+            for(Node temp : thing){    
+                if(!allnodes.get(w).getNeighbors().contains(temp))
+                    allnodes.get(w).addNeighbor(temp);
+            }
                     //nodes.get(w).setNeighbors(whatsVisible(nodes.get(w).getX(),nodes.get(w).getY()));
             
         }
@@ -292,9 +303,7 @@ public class AI_PROJ1 extends Application {
         System.out.println(nodes.size()); 
         for(Node tempnode : allnodes){
             tempnode.setData(tempnode.getX() + "  " + tempnode.getY());
-            for(Node neigh : tempnode.getNeighbors())
-                System.out.println(neigh.getData());
-            System.out.println();
+            System.out.println(tempnode.getData() + " " + tempnode.getNeighbors().size());   
         }
         
         traverse(startnode,endnode);
@@ -334,15 +343,16 @@ public void traverse(Node begin, Node end) {
         //System.out.println(openList.size());    
         //System.out.println(current.getData());
         if (current.equals(end)) {
+            begin.setParent(null);
             System.out.println("Goal Reached!");
-            printPath(current);
+            printPath(current.getParent());
             return;
         }
         //System.out.println("neighbors" + neighbors.size());
         
         closedList.add(openList.poll());
         
-        ArrayList<Node> neighbors = current.getNeighbors();
+        HashSet<Node> neighbors = current.getNeighbors();
         //closedList.add(openList.poll());
         //System.out.println(neighbors); 
         //System.out.println("neighbors" + neighbors.size());
@@ -350,8 +360,8 @@ public void traverse(Node begin, Node end) {
             
             double gScore = gVals.get(current) + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
             double fScore = gScore + h(neighbor, current);
-         //   System.out.println(neighbors);
-         //   System.out.println(closedList);
+        //    System.out.println(neighbors);
+        //    System.out.println(closedList);
             if(closedList.contains(neighbor)) {
                 System.out.println("contains");
                 if(gVals.get(neighbor) == null) {
@@ -404,12 +414,35 @@ public double h(Node node, Node goal) {
     return x*x +y*y;
 }
 public void printPath(Node node) {
-    System.out.println(node.getData());
+    //System.out.println(node.getData());
     while (node.getParent() != null) {
         node = node.getParent();
+        try{
+            Thread.sleep(1000);
+        }catch(InterruptedException ex){
+            Thread.currentThread().interrupt();
+        }
+
         System.out.println(node.getData());
     }
 }
+public void asdprintPath(Node node) {
+    ArrayList<Node> path = new ArrayList<>();
+    path.add(node);
+    while(true){
+        if(node.getParent() == null){
+            break;
+        }
+        node = node.getParent();
+        path.add(node);
+
+        
+    }
+    System.out.println(path);
+
+
+}
+
 class fCompare implements Comparator<Node> {
     public int compare(Node o1, Node o2) {
         if(fVals.get(o1) < fVals.get(o2)) {
@@ -422,8 +455,8 @@ class fCompare implements Comparator<Node> {
             return 0;
     }
 }
-private static ArrayList<Node> whatsVisible(Node vertex){
-    ArrayList<Node> childs = new ArrayList<>();
+private static HashSet<Node> whatsVisible(Node vertex){
+    HashSet<Node> childs = new HashSet<>();
     ArrayList<Polygon> triangles = new ArrayList<>();
     for(int i = 0; i < vpoly1.getPoints().size(); i+=2){
         Polygon triangle = new Polygon();
@@ -458,11 +491,29 @@ private static ArrayList<Node> whatsVisible(Node vertex){
        );
        triangles.add(triangle);
     }
+    //for(int i = 0; i < 2 i++){
+       Polygon triangle = new Polygon();
+        triangle.getPoints().setAll(
+                vertex.getX(),vertex.getY(),
+                950d, 950d,
+                950.0000001,950.0000001
+                );
+        triangles.add(triangle);
+        triangle = new Polygon();
+        triangle.getPoints().setAll(
+                vertex.getX(),vertex.getY(),
+                robit.getPoints().get(4),
+                robit.getPoints().get(5),
+                robit.getPoints().get(4) +0.0000001,
+                robit.getPoints().get(5) + 0.0000001 
+                );
+        triangles.add(triangle);
+    //}
         Shape totalError = Shape.union(error1,error2);
         totalError = Shape.union(totalError,error3);
     for(Polygon tri : triangles){   
         Shape inter = Shape.intersect(totalError,tri);
-        if(inter.getLayoutBounds().getHeight() <= 0 || inter.getLayoutBounds().getHeight() <= 0){
+        if(inter.getLayoutBounds().getHeight() <= 0 || inter.getLayoutBounds().getWidth() <= 0){
             Node one = new Node(tri.getPoints().get(2),tri.getPoints().get(3));
             Node two = new Node(tri.getPoints().get(4),tri.getPoints().get(5));
             int dex1 = allnodes.indexOf(one);
@@ -563,7 +614,7 @@ private static void setVis(double x, double y, Polygon poly){
   private static Polygon createThirdPolygon() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(
-        600d, 900d, 
+        600d, 900d,
         730d, 850d,
         800d, 730d,
         750d, 630d,

@@ -2,18 +2,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class Node {
 
     private Node parent;
-    private ArrayList<Node> neighbors;
+    private HashSet<Node> neighbors;
     private double x;
     private double y;
     private Object data;
 
     public Node() {
-        neighbors = new ArrayList<Node>();
+        neighbors = new HashSet<Node>();
         data = new Object();
     }
 
@@ -35,11 +35,11 @@ public class Node {
         this.y = y;
     }
 
-    public ArrayList<Node> getNeighbors() {
+    public HashSet<Node> getNeighbors() {
         return neighbors;
     }
 
-    public void setNeighbors(ArrayList<Node> neighbors) {
+    public void setNeighbors(HashSet<Node> neighbors) {
         this.neighbors = neighbors;
     }
 

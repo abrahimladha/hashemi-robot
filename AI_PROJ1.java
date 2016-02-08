@@ -307,8 +307,16 @@ public class AI_PROJ1 extends Application {
 public void playAnim(){
 pt = new PathTransition();
 path = new Path();
-    MoveTo mt = new MoveTo(robit.getPoints().get(2),robit.getPoints().get(3));
-    path.getElements().add(mt);
+    
+MoveTo mt = new MoveTo(robit.getPoints().get(2),robit.getPoints().get(3));
+
+path.getElements().add(mt);
+Polygon balance = new Polygon();
+    balance.getPoints().addAll(
+        robit.getPoints().get(2),robit.getPoints().get(3),
+        robit.getPoints().get(2) - a,robit.getPoints().get(3),
+        robit.getPoints().get(2) - 0.5*a, robit.getPoints().get(3) + 0.866*a
+        );
     for(int i = 0; i < sline.getPoints().size(); i+=2){
         LineTo lt = new LineTo();
         lt.setX(sline.getPoints().get(i));
@@ -317,7 +325,14 @@ path = new Path();
     }
     pt.setDuration(Duration.seconds(8));
     pt.setPath(path);
-    pt.setNode(robit);
+    //Shape s = Shape.union(robit,balance);
+    //s.setFill(Color.RED);
+    //root.getChildren().addAll(s);
+    Group g = new Group();
+    g.getChildren().addAll(balance,robit);
+    balance.setFill(Color.TRANSPARENT);
+    root.getChildren().addAll(g);
+    pt.setNode(g);
     //pt.setCycleCount(Timeline.INDEFINITE);
     pt.setAutoReverse(true);
     robit.toFront();

@@ -62,9 +62,10 @@ public class AI_PROJ1 extends Application {
     Pane box = new Pane();
     
     @Override public void start(final Stage stage) throws Exception {        
-    goal.getPoints().setAll(1000d, 1000d, 1000d, 950d, 950d, 950d, 950d, 1000d);
+    goal.getPoints().setAll(700d, 700d, 700d, 670d, 670d, 670d, 670d, 700d);
     goal.setFill(Color.RED); 
-    
+    goal.setStroke(Color.BLACK);
+    box.setPrefSize(700,700); 
    // Button plusbutton = new Button("+");
    // Button minusbutton = new Button("-");
    // Button resetbutton = new Button("RESET");
@@ -117,9 +118,9 @@ public class AI_PROJ1 extends Application {
     vpoly3.setStrokeWidth(1);
     vpoly3.setFill(Color.TRANSPARENT);
 
-    error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
-    error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
-    error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
+    error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.99))));
+    error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.99))));
+    error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));
 
     box.getChildren().addAll(vpoly1,vpoly2,vpoly3);
     box.getChildren().addAll(poly1,poly2,poly3);
@@ -131,16 +132,16 @@ public class AI_PROJ1 extends Application {
     vb.getChildren().addAll(box, hb);
     root.getChildren().addAll(vb);
     
-    Scene scene1 = new Scene(root, 1080, 1080, Color.ALICEBLUE);
+    Scene scene1 = new Scene(root, 700, 725, Color.ALICEBLUE);
 
     scene1.setOnMouseDragged(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
          vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
          vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
          vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
-         error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
-         error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
-         error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
+         error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.99))));
+         error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.99))));
+         error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));
         }
 	});
     stage.setTitle("AI_PROJ1");
@@ -152,17 +153,18 @@ public class AI_PROJ1 extends Application {
   class plusButton implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e){
+      if(a < 60.0){
         a += 1.0;
         vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
         vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
         
-        error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
-        error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
-        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
+        error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.99))));
+        error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.99))));
+        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));
         
         robit.getPoints().setAll(drawRobit(a).getPoints());
-    
+        }
     }
 }
   class minusButton implements EventHandler<ActionEvent> {
@@ -174,70 +176,64 @@ public class AI_PROJ1 extends Application {
         vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
         
-        error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
-        error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
-        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
+        error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.99))));
+        error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.99))));
+        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));
 
         robit.getPoints().setAll(drawRobit(a).getPoints());
         }
     }
   }
- class resetButton implements EventHandler<ActionEvent> {
+
+   class resetButton implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e){
-       a = 30.0;
-       gVals.clear();
-       fVals.clear();
-       openList.clear();
-       closedList.clear();
-       allnodes.clear();
-       visibles.clear();
-       sline = new Polyline();
-       box.getChildren().clear();
-       calculatebutton.setDisable(false);
-       poly1 = createFirstPolygon();       
-       poly2 = createSecondPolygon();
-       poly3 = createThirdPolygon();
-       robit = drawRobit(a);
-        //vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
-        //vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
-        //vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
-        //error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
-        //error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
-        //error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
+        visibles.clear();
+        calculatebutton.setDisable(false);
+        Pane pnew = new Pane();
+        box = new VBox();
+        a = 30.0;
+        robit = drawRobit(a);
+        poly1 = createFirstPolygon();
+        poly2 = createSecondPolygon();
+        poly3 = createThirdPolygon();
+        box.getChildren().clear();
+        root.getChildren().clear();
+        hb.getChildren().clear();
+        sline.getPoints().clear();
+        possiblepaths.getChildren().clear();
+         
+        hb.getChildren().addAll(plusbutton,minusbutton,resetbutton,calculatebutton);
+        
+        pnew.getChildren().addAll(poly1,poly2,poly3,robit,goal);
         vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
-        vpoly1.setStroke(Color.BLACK);
-        vpoly1.setStrokeWidth(1);
-        vpoly1.setFill(Color.TRANSPARENT);
-                     
-        vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
-        vpoly2.setStroke(Color.BLACK);
-        vpoly2.setStrokeWidth(1);
-        vpoly2.setFill(Color.TRANSPARENT);  
-        vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
-        vpoly3.setStroke(Color.BLACK);
-        vpoly3.setStrokeWidth(1);
-        vpoly3.setFill(Color.TRANSPARENT); 
-        error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.9))));
-        error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.9))));
-        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.9))));
-        box.getChildren().addAll(vpoly1,vpoly2,vpoly3);
-        box.getChildren().addAll(poly1,poly2,poly3);
-        box.getChildren().addAll(robit,goal);
-        box.getChildren().addAll(createControlAnchorsFor(poly1.getPoints()));
-        box.getChildren().addAll(createControlAnchorsFor(poly2.getPoints()));
-        box.getChildren().addAll(createControlAnchorsFor(poly3.getPoints()));
-        box.getChildren().addAll(possiblepaths);
-        vb.getChildren().addAll(box, hb);
-        root.getChildren().addAll(vb);
-        //root.getChildren.addAll()
-    }
-  }
+        vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a)))); 
+        vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a)))); 
+        
+        error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.99))));
+        error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.99))));
+        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));
+            
+        pnew.getChildren().addAll(vpoly1,vpoly2);
+        pnew.getChildren().addAll(vpoly3);
+        pnew.getChildren().addAll(createControlAnchorsFor(poly1.getPoints()));
+        pnew.getChildren().addAll(createControlAnchorsFor(poly2.getPoints()));
+        pnew.getChildren().addAll(createControlAnchorsFor(poly3.getPoints()));
+        
+        box.getChildren().addAll(pnew,hb);
+        root.getChildren().addAll(box);
+        //for(Polyline path : visibles){
+         //   path.setStroke(Color.LIGHTGRAY);
+         //   if(!root.getChildren().contains(path));
+        //    root.getChildren().addAll(path);     
+        //}
 
+    }
+   }
  class calculateButton implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e){
-
+        possiblepaths.getChildren().clear();
         calculatebutton.setDisable(true);
         for(int i = 0; i < vpoly2.getPoints().size(); i+=2){
             setVis(vpoly2.getPoints().get(i),vpoly2.getPoints().get(i+1),vpoly1);
@@ -285,12 +281,13 @@ public class AI_PROJ1 extends Application {
         for(int w = 0; w < allnodes.size(); w++){
             allnodes.get(w).setNeighbors(whatsVisible(allnodes.get(w)));
         }
-
+            possiblepaths.getChildren().clear();
         for(Polyline path : visibles){
             path.setStroke(Color.LIGHTGRAY);
-            possiblepaths.getChildren().addAll(path);     
+            //possiblepaths.getChildren().addAll(path);     
+            root.getChildren().add(path);
         }
-        
+        root.getChildren().add(possiblepaths);
      //   System.out.println(nodes.size()); 
         for(Node tempnode : allnodes){
             tempnode.setData(tempnode.getX() + "  " + tempnode.getY());
@@ -298,7 +295,8 @@ public class AI_PROJ1 extends Application {
         }    
         traverse(endnode,startnode);
         sline.setStrokeWidth(4);
-        box.getChildren().addAll(sline);
+        sline.setStroke(Color.GREEN);
+        root.getChildren().addAll(sline);
     }
  }
 public void traverse(Node begin, Node end) {
@@ -368,6 +366,7 @@ public double h(Node node, Node goal) {
     return x*x +y*y;
 }
 public void printPath(Node node) {
+    sline.getPoints().clear();
     sline.getPoints().add(node.getX());
     sline.getPoints().add(node.getY());
     while (node.getParent() != null) {
@@ -377,14 +376,6 @@ public void printPath(Node node) {
         System.out.println(node.getData());
     }
 }
-public void reconstructpath(HashMap<Node,Node> map, Node current) {
-    System.out.println(current.getData());
-        while(map.containsKey(current)){               
-            current = map.get(current);
-            System.out.println(current.getData());
-        }   
-}
-
 class fCompare implements Comparator<Node> {
     public int compare(Node o1, Node o2) {
         if(fVals.get(o1) < fVals.get(o2)) {
@@ -437,8 +428,8 @@ private static HashSet<Node> whatsVisible(Node vertex){
        Polygon triangle = new Polygon();
         triangle.getPoints().setAll(
                 vertex.getX(),vertex.getY(),
-                950d, 950d,
-                950.0000001,950.0000001
+                670d, 670d,
+                670.0000001,670.0000001
                 );
         triangles.add(triangle);
         triangle = new Polygon();
@@ -521,14 +512,13 @@ private static void setVis(double x, double y, Polygon poly){
    private static Polygon createFirstPolygon() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(
-        400d, 150d,
-        500d, 200d, 
-        550d, 300d,
-        540d, 400d,
-        480d, 480d,
-        370d, 420d,
-        320d, 330d,
-        350d, 240d
+        280d, 110d,
+        350d, 150d, 
+        330d, 210d,
+        300d, 280d,
+        180d, 270d,
+        170d, 220d,
+        200d, 160d
     );
     triangle.setStroke(Color.BLUE);
     triangle.setStrokeWidth(4);
@@ -539,12 +529,14 @@ private static void setVis(double x, double y, Polygon poly){
    private static Polygon createSecondPolygon() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(
-        330d, 580d,
-        200d, 600d,
-        150d, 700d, 
-        110d, 830d, 
-        280d, 840d, 
-        370d, 680d
+        320d, 410d,
+        390d, 440d,
+        420d, 480d, 
+        400d, 540d, 
+        360d, 590d, 
+        280d, 580d,
+        250d, 520d,
+        270d, 460d
     );
 
     triangle.setStroke(Color.BLUE);
@@ -556,12 +548,15 @@ private static void setVis(double x, double y, Polygon poly){
   private static Polygon createThirdPolygon() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(
-        600d, 900d,
-        730d, 850d,
-        800d, 730d,
-        750d, 630d,
-        580d, 700d,
-        500d, 800d
+        560d, 200d,
+        630d, 220d,
+        650d, 300d,
+        610d, 370d,
+        580d, 400d,
+        510d, 380d,
+        460d, 340d,
+        430d, 270d,
+        490d, 210d
     );
     triangle.setStroke(Color.BLUE);
     triangle.setStrokeWidth(4);

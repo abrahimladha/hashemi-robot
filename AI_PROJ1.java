@@ -50,7 +50,7 @@ public class AI_PROJ1 extends Application {
     static ArrayList<Node> allnodes = new ArrayList<>();
     static ArrayList<Node> nodes = new ArrayList<>();
     
-    static ArrayList<Node> shortestpath = new ArrayList<>();
+    static Polyline sline = new Polyline();
     
     @Override public void start(final Stage stage) throws Exception {
         
@@ -276,7 +276,7 @@ public class AI_PROJ1 extends Application {
                 n.addNeighbor(prev);
             allnodes.add(n);
         }
-        Node startnode = new Node(robit.getPoints().get(4),robit.getPoints().get(5));
+        Node startnode = new Node(robit.getPoints().get(2),robit.getPoints().get(3));
         Node endnode = new Node(goal.getPoints().get(4),goal.getPoints().get(5));
        // nodes.add(startnode);
        // nodes.add(endnode);
@@ -308,10 +308,11 @@ public class AI_PROJ1 extends Application {
             System.out.println(tempnode.getData() + " " + tempnode.getNeighbors().size());   
         }
         
-        traverse(startnode,endnode);
+        traverse(endnode,startnode);
         //System.out.println(nodes.get(0).getX() + "  " + nodes.get(0).getY());
         //traverse(startnode,endnode);
-        Polyline sline = new Polyline();
+        sline.setStrokeWidth(4);
+        root.getChildren().addAll(sline);
         //for(Node n : shortestpath)
           //  sline.getPoints().add((double)(n.getX()),(double)(n.getY()));
         //sline.getStrokeWidth(2);
@@ -355,8 +356,8 @@ public void traverse(Node begin, Node end) {
         
         HashSet<Node> neighbors = current.getNeighbors();
         for (Node neighbor : neighbors) {
-            double gScore = gVals.get(current) + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
-            double fScore = gScore + h(neighbor, current);
+            double gScore = gVals.get(current);// + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
+            double fScore = gScore + Math.sqrt(h(neighbor, end));
         
             if(closedList.contains(neighbor)) {
                 System.out.println("contains");
@@ -388,43 +389,7 @@ public void traverse(Node begin, Node end) {
     }
       System.out.println("FAIL");
 }
-public void ftraverse(Node begin, Node end){
-    openList = new PriorityQueue<Node>(new fCompare());
-    closedList = new HashSet<>();
-    gVals.put(begin,0.0);
-    while(!openList.isEmpty()) {
-        Node current = openList.element();
-        if(current.equals(end)) {
-            System.out.println("Goal Reached!");
-            printPath(current);
-            return;
-        }
-        closedList.add(openList.poll());
-        HashSet<Node> neighbors = current.getNeighbors();
-        for(Node neighbor : neighbors){
-            double gScore = gVals.get(current) + Math.sqrt(h(current,neighbor));
-            double fScore = gScore + Math.sqrt(h(neighbor,end));
-            
-            if(closedList.contains(neighbor)){
-                //if(gVals.get(neighbor) == null)
-                    gVals.put(neighbor,gScore);
-                //if(fVals.get(neighbor) == null)
-                    fVals.put(neighbor,fScore);
-                if(fScore >= fVals.get(neighbor))
-                    continue;
-            }
-            if(!openList.contains(neighbor) || fScore < fVals.get(neighbor)){
-                neighbor.setParent(current);
-                gVals.put(neighbor,gScore);
-                fVals.put(neighbor,fScore);
-                if(!openList.contains(neighbor)) {
-                    openList.add(neighbor);
-                }
-            }
-        }
-    }
-    System.out.println("you failed!");
-}
+
 public double EuclideanDistance(double x1, double y1, double x2, double y2){
    return Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2 - y1,2));
 }
@@ -434,15 +399,12 @@ public double h(Node node, Node goal) {
     return x*x +y*y;
 }
 public void printPath(Node node) {
-    //System.out.println(node.getData());
+    sline.getPoints().add(node.getX());
+    sline.getPoints().add(node.getY());
     while (node.getParent() != null) {
         node = node.getParent();
-        try{
-            Thread.sleep(1000);
-        }catch(InterruptedException ex){
-            Thread.currentThread().interrupt();
-        }
-
+        sline.getPoints().add(node.getX());
+        sline.getPoints().add(node.getY());
         System.out.println(node.getData());
     }
 }
@@ -513,10 +475,10 @@ private static HashSet<Node> whatsVisible(Node vertex){
         triangle = new Polygon();
         triangle.getPoints().setAll(
                 vertex.getX(),vertex.getY(),
-                robit.getPoints().get(4),
-                robit.getPoints().get(5),
-                robit.getPoints().get(4) +0.0000001,
-                robit.getPoints().get(5) + 0.0000001 
+                robit.getPoints().get(2),
+                robit.getPoints().get(3),
+                robit.getPoints().get(2) +0.0000001,
+                robit.getPoints().get(3) + 0.0000001 
                 );
         triangles.add(triangle);
     //}

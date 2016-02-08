@@ -10,46 +10,44 @@ import javafx.scene.*;
 import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
-import javafx.stage.Stage;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 public class Anchor extends Circle {
     private final DoubleProperty x, y;
 
     Anchor(Color color, DoubleProperty x, DoubleProperty y) {
-      super(x.get(), y.get(), 3);
+      super(x.get(), y.get(), 5);
       setFill(color);
       setStroke(color);
       setStrokeWidth(1);
       setStrokeType(StrokeType.OUTSIDE);
-
       this.x = x;
       this.y = y;
-
       x.bind(centerXProperty());
       y.bind(centerYProperty());
       enableDrag();
     }
-
-    // make a node movable by dragging it around with the mouse.
+    // drag a vertice of the polygon around
     private void enableDrag() {
       final Delta dragDelta = new Delta();
+      //mouse down?
       setOnMousePressed(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
-          // record a delta distance for the drag and drop operation.
+          // delta change from drag and drop distance.
           dragDelta.x = getCenterX() - mouseEvent.getX();
           dragDelta.y = getCenterY() - mouseEvent.getY();
           getScene().setCursor(Cursor.MOVE);
         }
       });
+      //mouse lifted?
       setOnMouseReleased(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
           getScene().setCursor(Cursor.HAND);
 
         }
       });
+      //mouse down and moving?
       setOnMouseDragged(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
           double newX = mouseEvent.getX() + dragDelta.x;
@@ -60,10 +58,9 @@ public class Anchor extends Circle {
           if (newY > 0 && newY < getScene().getHeight()) {
             setCenterY(newY);
           }
-         //vtriangle.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(triangle.getPoints(),a))));
-
         }
       });
+      //mouse entered?
       setOnMouseEntered(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
           if (!mouseEvent.isPrimaryButtonDown()) {
@@ -71,6 +68,7 @@ public class Anchor extends Circle {
           }
         }
       });
+      //mouse exited?
       setOnMouseExited(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
           if (!mouseEvent.isPrimaryButtonDown()) {
@@ -79,7 +77,6 @@ public class Anchor extends Circle {
         }
       });
     }
-
-    // records relative x and y co-ordinates.
+    // keeps relative x's and y's
     private class Delta { double x, y; }
   }

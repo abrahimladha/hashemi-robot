@@ -15,7 +15,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
-
+import javafx.animation.*;
+import javafx.util.*;
+import javafx.scene.shape.Path;
 /** Drag the anchors around to change a polygon's points. */
 public class AI_PROJ1 extends Application {
 
@@ -61,6 +63,8 @@ public class AI_PROJ1 extends Application {
     VBox vb = new VBox();
     Pane box = new Pane();
     
+    static Path path = new Path();
+    static PathTransition pt = new PathTransition();
     @Override public void start(final Stage stage) throws Exception {        
     goal.getPoints().setAll(700d, 700d, 700d, 670d, 670d, 670d, 670d, 700d);
     goal.setFill(Color.RED); 
@@ -283,22 +287,43 @@ public class AI_PROJ1 extends Application {
         }
             possiblepaths.getChildren().clear();
         for(Polyline path : visibles){
-            path.setStroke(Color.LIGHTGRAY);
-            //possiblepaths.getChildren().addAll(path);     
+            path.setStroke(Color.LIGHTGRAY);   
             root.getChildren().add(path);
         }
         root.getChildren().add(possiblepaths);
-     //   System.out.println(nodes.size()); 
         for(Node tempnode : allnodes){
             tempnode.setData(tempnode.getX() + "  " + tempnode.getY());
             System.out.println(tempnode.getData() + " " + tempnode.getNeighbors().size());   
         }    
         traverse(endnode,startnode);
         sline.setStrokeWidth(4);
-        sline.setStroke(Color.GREEN);
         root.getChildren().addAll(sline);
+        
+        playAnim();
+
+
     }
  }
+public void playAnim(){
+pt = new PathTransition();
+path = new Path();
+    MoveTo mt = new MoveTo(robit.getPoints().get(2),robit.getPoints().get(3));
+    path.getElements().add(mt);
+    for(int i = 0; i < sline.getPoints().size(); i+=2){
+        LineTo lt = new LineTo();
+        lt.setX(sline.getPoints().get(i));
+        lt.setY(sline.getPoints().get(i+1));
+        path.getElements().add(lt);
+    }
+    pt.setDuration(Duration.seconds(8));
+    pt.setPath(path);
+    pt.setNode(robit);
+    //pt.setCycleCount(Timeline.INDEFINITE);
+    pt.setAutoReverse(true);
+    robit.toFront();
+    pt.play();
+}
+
 public void traverse(Node begin, Node end) {
    openList = new PriorityQueue<Node>(1000, new fCompare());
     closedList = new HashSet<>();

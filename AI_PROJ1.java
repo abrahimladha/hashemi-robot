@@ -24,25 +24,17 @@ public class AI_PROJ1 extends Application {
   public static void main(String[] args) throws Exception { launch(args); }
     static Polygon vpoly1 = new Polygon();
     static Polygon vpoly2 = new Polygon();
-    static Polygon vpoly3 = new Polygon();
-    
+    static Polygon vpoly3 = new Polygon();    
     static Polygon poly1 = createFirstPolygon();
     static Polygon poly2 = createSecondPolygon();
     static Polygon poly3 = createThirdPolygon();
-    
     static Polygon error1 = new Polygon();
     static Polygon error2 = new Polygon();
     static Polygon error3 = new Polygon();
-
     static double a = 30.0;
     static Polygon robit = drawRobit(a);
     static Polygon goal = new Polygon();
-
-    //static ArrayList<Point2D> vertices = new ArrayList<>();
-    //static ArrayList<Polyline> edges = new ArrayList<>();
-
     static ArrayList<Polyline> visibles = new ArrayList<>();
-    
     static Group root = new Group();
     static Pane possiblepaths = new Pane();
     static PriorityQueue<Node> openList;
@@ -50,19 +42,14 @@ public class AI_PROJ1 extends Application {
     HashMap<Node, Double> gVals = new HashMap<>();
     HashMap<Node, Double> fVals = new HashMap<>();
     static ArrayList<Node> allnodes = new ArrayList<>();
-    //static ArrayList<Node> nodes = new ArrayList<>();
-    
     static Polyline sline = new Polyline();
-    
     Button calculatebutton = new Button("CALCULATE");
     Button plusbutton = new Button("+");
     Button minusbutton = new Button("-");
     Button resetbutton = new Button("RESET");
-    
     HBox hb = new HBox();
     VBox vb = new VBox();
     Pane box = new Pane();
-    
     static Path path = new Path();
     static PathTransition pt = new PathTransition();
     @Override public void start(final Stage stage) throws Exception {        
@@ -70,62 +57,38 @@ public class AI_PROJ1 extends Application {
     goal.setFill(Color.RED); 
     goal.setStroke(Color.BLACK);
     box.setPrefSize(700,700); 
-   // Button plusbutton = new Button("+");
-   // Button minusbutton = new Button("-");
-   // Button resetbutton = new Button("RESET");
-   // Button calculatebutton = new Button("CALCULATE");
-
     plusButton handler1 = new plusButton();
     plusbutton.setOnAction(handler1);
-
-
     minusButton handler2 = new minusButton();
     minusbutton.setOnAction(handler2);
-
-
     resetButton handler3 = new resetButton();
     resetbutton.setOnAction(handler3);
-    
-
     calculateButton handler4 = new calculateButton();
     calculatebutton.setOnAction(handler4);
-
-
-    //HBox hb = new HBox();
-    //VBox vb = new VBox();
-    //Pane box = new Pane();
-
     hb.setHgrow(plusbutton, Priority.ALWAYS);
     hb.setHgrow(minusbutton, Priority.ALWAYS);
     hb.setHgrow(calculatebutton, Priority.ALWAYS);
     hb.setHgrow(resetbutton, Priority.ALWAYS);
-
     plusbutton.setMaxWidth(Double.MAX_VALUE);
     minusbutton.setMaxWidth(Double.MAX_VALUE);
     resetbutton.setMaxWidth(Double.MAX_VALUE);
     calculatebutton.setMaxWidth(Double.MAX_VALUE);
-    
     hb.getChildren().addAll(plusbutton,minusbutton,resetbutton,calculatebutton);
-    
     vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
     vpoly1.setStroke(Color.BLACK);
     vpoly1.setStrokeWidth(1);
     vpoly1.setFill(Color.TRANSPARENT);
-
     vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
     vpoly2.setStroke(Color.BLACK);
     vpoly2.setStrokeWidth(1);
     vpoly2.setFill(Color.TRANSPARENT);
-
     vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
     vpoly3.setStroke(Color.BLACK);
     vpoly3.setStrokeWidth(1);
     vpoly3.setFill(Color.TRANSPARENT);
-
     error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.99))));
     error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.99))));
     error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));
-
     box.getChildren().addAll(vpoly1,vpoly2,vpoly3);
     box.getChildren().addAll(poly1,poly2,poly3);
     box.getChildren().addAll(robit,goal);
@@ -135,9 +98,7 @@ public class AI_PROJ1 extends Application {
     box.getChildren().addAll(possiblepaths);
     vb.getChildren().addAll(box, hb);
     root.getChildren().addAll(vb);
-    
     Scene scene1 = new Scene(root, 700, 725, Color.ALICEBLUE);
-
     scene1.setOnMouseDragged(new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
          vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
@@ -154,24 +115,24 @@ public class AI_PROJ1 extends Application {
     );
     stage.show();
   }
-  class plusButton implements EventHandler<ActionEvent> {
+//plusbutton handler
+class plusButton implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e){
-      if(a < 60.0){
+      if(a < 75.0){
         a += 1.0;
         vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
         vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
-        
         error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.99))));
         error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.99))));
-        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));
-        
+        error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));       
         robit.getPoints().setAll(drawRobit(a).getPoints());
         }
     }
 }
-  class minusButton implements EventHandler<ActionEvent> {
+//minusbutton handler
+class minusButton implements EventHandler<ActionEvent> {
     @Override 
      public void handle(ActionEvent e){
         if(a > 1.1){
@@ -179,17 +140,15 @@ public class AI_PROJ1 extends Application {
         vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
         vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a))));
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a))));
-        
         error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.99))));
         error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.99))));
         error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));
-
         robit.getPoints().setAll(drawRobit(a).getPoints());
         }
     }
-  }
-
-   class resetButton implements EventHandler<ActionEvent> {
+}
+//resetbutton handler
+class resetButton implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e){
         visibles.clear();
@@ -206,35 +165,25 @@ public class AI_PROJ1 extends Application {
         hb.getChildren().clear();
         sline.getPoints().clear();
         possiblepaths.getChildren().clear();
-         
         hb.getChildren().addAll(plusbutton,minusbutton,resetbutton,calculatebutton);
-        
         pnew.getChildren().addAll(poly1,poly2,poly3,robit,goal);
         vpoly1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a))));
         vpoly2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a)))); 
         vpoly3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a)))); 
-        
         error1.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly1.getPoints(),a*0.99))));
         error2.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly2.getPoints(),a*0.99))));
         error3.getPoints().setAll(getConvexHull(pointSorter(virtualToRealPolygon(poly3.getPoints(),a*0.99))));
-            
         pnew.getChildren().addAll(vpoly1,vpoly2);
         pnew.getChildren().addAll(vpoly3);
         pnew.getChildren().addAll(createControlAnchorsFor(poly1.getPoints()));
         pnew.getChildren().addAll(createControlAnchorsFor(poly2.getPoints()));
         pnew.getChildren().addAll(createControlAnchorsFor(poly3.getPoints()));
-        
         box.getChildren().addAll(pnew,hb);
         root.getChildren().addAll(box);
-        //for(Polyline path : visibles){
-         //   path.setStroke(Color.LIGHTGRAY);
-         //   if(!root.getChildren().contains(path));
-        //    root.getChildren().addAll(path);     
-        //}
-
     }
-   }
- class calculateButton implements EventHandler<ActionEvent> {
+}
+//calculatebutton handler
+class calculateButton implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e){
         possiblepaths.getChildren().clear();
@@ -250,7 +199,6 @@ public class AI_PROJ1 extends Application {
             if(!n.getNeighbors().contains(prev))
                 n.addNeighbor(prev);
             allnodes.add(n);
-        
         }
         for(int j = 0; j < vpoly3.getPoints().size(); j+=2){
             setVis(vpoly3.getPoints().get(j),vpoly3.getPoints().get(j+1),vpoly2);
@@ -285,33 +233,25 @@ public class AI_PROJ1 extends Application {
         for(int w = 0; w < allnodes.size(); w++){
             allnodes.get(w).setNeighbors(whatsVisible(allnodes.get(w)));
         }
-            possiblepaths.getChildren().clear();
         for(Polyline path : visibles){
             path.setStroke(Color.LIGHTGRAY);   
             root.getChildren().add(path);
         }
-        root.getChildren().add(possiblepaths);
-        for(Node tempnode : allnodes){
+        for(Node tempnode : allnodes)
             tempnode.setData(tempnode.getX() + "  " + tempnode.getY());
-            System.out.println(tempnode.getData() + " " + tempnode.getNeighbors().size());   
-        }    
         traverse(endnode,startnode);
         sline.setStrokeWidth(4);
         root.getChildren().addAll(sline);
-        
         playAnim();
-
-
     }
  }
+//put all the animation stuff in one method
 public void playAnim(){
-pt = new PathTransition();
-path = new Path();
-    
-MoveTo mt = new MoveTo(robit.getPoints().get(2),robit.getPoints().get(3));
-
-path.getElements().add(mt);
-Polygon balance = new Polygon();
+    pt = new PathTransition();
+    path = new Path();
+    MoveTo mt = new MoveTo(robit.getPoints().get(2),robit.getPoints().get(3));
+    path.getElements().add(mt);
+    Polygon balance = new Polygon();
     balance.getPoints().addAll(
         robit.getPoints().get(2),robit.getPoints().get(3),
         robit.getPoints().get(2) - a,robit.getPoints().get(3),
@@ -325,27 +265,20 @@ Polygon balance = new Polygon();
     }
     pt.setDuration(Duration.seconds(8));
     pt.setPath(path);
-    //Shape s = Shape.union(robit,balance);
-    //s.setFill(Color.RED);
-    //root.getChildren().addAll(s);
     Group g = new Group();
     g.getChildren().addAll(balance,robit);
     balance.setFill(Color.TRANSPARENT);
     root.getChildren().addAll(g);
     pt.setNode(g);
-    //pt.setCycleCount(Timeline.INDEFINITE);
     pt.setAutoReverse(true);
     robit.toFront();
     pt.play();
 }
-
+//literally the implementation of A*
 public void traverse(Node begin, Node end) {
    openList = new PriorityQueue<Node>(1000, new fCompare());
     closedList = new HashSet<>();
      openList.clear(); 
- //   closedList.clear();
-   // fVals.clear();
-   // gVals.clear();
     HashMap<Node,Node> cameFrom = new HashMap<Node,Node>();
     gVals.put(begin,0.0);
     openList.add(begin);
@@ -355,55 +288,36 @@ public void traverse(Node begin, Node end) {
             begin.setParent(null);
             System.out.println("Goal Reached!");
             printPath(current);
-            //reconstructpath(cameFrom,current);
             return;
         }
-        
         closedList.add(openList.poll());
-        
         HashSet<Node> neighbors = current.getNeighbors();
         for (Node neighbor : neighbors) {
-            double gScore = gVals.get(current);// + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
-            double fScore = gScore + Math.sqrt(h(neighbor, end));
-        
+            double gScore = gVals.get(current);
+            double fScore = gScore + h(neighbor, end); 
             if(closedList.contains(neighbor)) {
-                System.out.println("contains");
-            //    if(gVals.get(neighbor) == null) {
                     gVals.put(neighbor, gScore);
-            //    }
-            //    if(fVals.get(neighbor) == null) {
                     fVals.put(neighbor, fScore);
-            //    }
-            //    if(closedList.contains(neighbor)){
                 if(fScore >= fVals.get(neighbor)) {
                     continue;
                 }
             }
-            if (!openList.contains(neighbor) || fScore < fVals.get(neighbor)) {
-                //current.setParent(neighbor);
+            if (!openList.contains(neighbor) || fScore < fVals.get(neighbor)){
                 neighbor.setParent(current);
-                //cameFrom.put(neighbor,current);
                 gVals.put(neighbor, gScore);
-                fVals.put(neighbor, fScore);
-            
+                fVals.put(neighbor, fScore);           
                 if(!openList.contains(neighbor)) {
                     openList.add(neighbor);
-                    System.out.println("added");
                 }
-            }
-            
+            }           
         }
     }
       System.out.println("FAIL");
 }
-
-public double EuclideanDistance(double x1, double y1, double x2, double y2){
-   return Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2 - y1,2));
-}
 public double h(Node node, Node goal) {
     double x = node.getX() - goal.getX();
     double y = node.getY()- goal.getY();
-    return x*x +y*y;
+    return Math.sqrt(x*x +y*y);
 }
 public void printPath(Node node) {
     sline.getPoints().clear();
@@ -428,6 +342,7 @@ class fCompare implements Comparator<Node> {
             return 0;
     }
 }
+//For some vertex param, returns the hashset of whats visible
 private static HashSet<Node> whatsVisible(Node vertex){
     HashSet<Node> childs = new HashSet<>();
     ArrayList<Polygon> triangles = new ArrayList<>();
@@ -464,7 +379,6 @@ private static HashSet<Node> whatsVisible(Node vertex){
        );
        triangles.add(triangle);
     }
-    //for(int i = 0; i < 2 i++){
        Polygon triangle = new Polygon();
         triangle.getPoints().setAll(
                 vertex.getX(),vertex.getY(),
@@ -481,7 +395,6 @@ private static HashSet<Node> whatsVisible(Node vertex){
                 robit.getPoints().get(3) + 0.0000001 
                 );
         triangles.add(triangle);
-    //}
         Shape totalError = Shape.union(error1,error2);
         totalError = Shape.union(totalError,error3);
     for(Polygon tri : triangles){   
@@ -502,11 +415,10 @@ private static HashSet<Node> whatsVisible(Node vertex){
                 }
             }
         }
-    }
-
-    
+    }   
     return childs;
 }
+//adds cools lines to draw to visibles based on what doesnt intersect
 private static void setVis(double x, double y, Polygon poly){
     for(int i = 0; i < poly.getPoints().size(); i+=2){
         Polygon triangle = new Polygon();
@@ -521,23 +433,18 @@ private static void setVis(double x, double y, Polygon poly){
         totalError = Shape.union(error3,totalError);
         Shape inter = Shape.intersect(totalError,triangle);
         if(inter.getLayoutBounds().getHeight() <= 0 || inter.getLayoutBounds().getWidth() <= 0){
-          //if(triangle.getBoundsInLocal().contains(vpoly1.getBoundsInLocal())){  
             Polyline one = new Polyline();
             Polyline two = new Polyline();
             one.getPoints().setAll(x,y,poly.getPoints().get(i),poly.getPoints().get(i+1));
             two.getPoints().setAll(x,y,poly.getPoints().get((i+2)%poly.getPoints().size()),
                     poly.getPoints().get((i+3)%poly.getPoints().size()));
-            //System.out.println(visibles.size());
-
             visibles.add(one);
             visibles.add(two);
         }
-        
     }
-
-
 }
-   private static Polygon drawRobit(double a) {
+//allows robit to change with the double value of a
+private static Polygon drawRobit(double a) {
     double corner = 1.0;
    Polygon robit = new Polygon();
    robit.getPoints().setAll(
@@ -548,8 +455,9 @@ private static void setVis(double x, double y, Polygon poly){
    robit.setStroke(Color.RED);
    robit.setFill(Color.YELLOW);
    return robit;
-   }
-   private static Polygon createFirstPolygon() {
+}
+//creates first polygon
+private static Polygon createFirstPolygon() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(
         280d, 110d,
@@ -565,8 +473,9 @@ private static void setVis(double x, double y, Polygon poly){
     triangle.setStrokeLineCap(StrokeLineCap.ROUND);
     triangle.setFill(Color.BLUE);
     return triangle;
-  }
-   private static Polygon createSecondPolygon() {
+}
+//creates second polygon
+private static Polygon createSecondPolygon() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(
         320d, 410d,
@@ -578,13 +487,13 @@ private static void setVis(double x, double y, Polygon poly){
         250d, 520d,
         270d, 460d
     );
-
     triangle.setStroke(Color.BLUE);
     triangle.setStrokeWidth(4);
     triangle.setStrokeLineCap(StrokeLineCap.ROUND);
     triangle.setFill(Color.BLUE);
     return triangle;
-  }
+}
+//creates third polygon
   private static Polygon createThirdPolygon() {
     Polygon triangle = new Polygon();
     triangle.getPoints().setAll(
@@ -603,8 +512,9 @@ private static void setVis(double x, double y, Polygon poly){
     triangle.setStrokeLineCap(StrokeLineCap.ROUND);
     triangle.setFill(Color.BLUE);
     return triangle;  
-  } 
-  private ObservableList<Double> pointSorter(ObservableList<Double> s){
+}
+//sorts points to comply with javafxs polygon renderer
+private ObservableList<Double> pointSorter(ObservableList<Double> s){
     double centerX = 0, centerY = 0;
     for(int i = 0; i < s.size(); i+=2){
         centerX += s.get(i);
@@ -622,22 +532,19 @@ private static void setVis(double x, double y, Polygon poly){
                 double temp = angles.get(w-1);
                 angles.set(w-1,angles.get(w));
                 angles.set(w, temp);
-
                 double tempx = s.get(2*(w-1));
                 double tempy = s.get(2*(w-1) + 1);
-
                 s.set(2*(w-1), s.get(2*w));
                 s.set(2*(w-1)+1, s.get((2*w) + 1));
-
                 s.set(2*w, tempx);
                 s.set((2*w)+1, tempy);
-                
             }
         }
     }
     return s;
-  }  
-  private ObservableList<Double> getConvexHull(ObservableList<Double> s){
+}
+//convex implementation modified slightly from liangs book
+private ObservableList<Double> getConvexHull(ObservableList<Double> s){
     Point2D[] myPoints = new Point2D[s.size()/2];
     for(int i = 0; i < myPoints.length; i++)
         myPoints[i] = new Point2D(s.get(2*i),s.get((2*i)+1));
@@ -689,13 +596,12 @@ private static void setVis(double x, double y, Polygon poly){
         else if (rightMostY == p[i].getY() && rightMostX < p[i].getX()){
             rightMostX = p[i].getX();
             rightMostIndex = i;
-        }
-        
+        }     
    }
     return p[rightMostIndex];
-  }
-
-  private ObservableList<Double> virtualToRealPolygon(final ObservableList<Double> rpoints, double a){
+}
+//creates virtual polygon per a value and polygons observable list values. used with convex hull
+private ObservableList<Double> virtualToRealPolygon(final ObservableList<Double> rpoints, double a){
    ObservableList<Double> vpoints = FXCollections.observableArrayList();
     for(int i = 0; i < rpoints.size(); i+= 2){
         vpoints.add(rpoints.get(i));
@@ -708,37 +614,26 @@ private static void setVis(double x, double y, Polygon poly){
         vpoints.add(rpoints.get(j+1));
     }
     return vpoints;
-  }
-  //private ObservableList<Double> virtualToRealPolygon()
-
-  // @return a list of anchors which can be dragged around to modify points in the format [x1, y1, x2, y2...]
-  private ObservableList<Anchor> createControlAnchorsFor(final ObservableList<Double> points) {
+}
+//returns a list of draggable anchors for polygon specified at each vertice
+private ObservableList<Anchor> createControlAnchorsFor(final ObservableList<Double> points) {
     ObservableList<Anchor> anchors = FXCollections.observableArrayList();
-
     for (int i = 0; i < points.size(); i+=2) {
       final int idx = i;
-
-      DoubleProperty xProperty = new SimpleDoubleProperty(points.get(i));
-      DoubleProperty yProperty = new SimpleDoubleProperty(points.get(i + 1));
-
-      xProperty.addListener(new ChangeListener<Number>() {
-        @Override public void changed(ObservableValue<? extends Number> ov, Number oldX, Number x) {
-          points.set(idx, (double) x);
-        }
-      });
-
-      yProperty.addListener(new ChangeListener<Number>() {
-        @Override public void changed(ObservableValue<? extends Number> ov, Number oldY, Number y) {
-          points.set(idx + 1, (double) y);
-        }
-      });
-
-      anchors.add(new Anchor(Color.BLUE, xProperty, yProperty));
+        DoubleProperty xProperty = new SimpleDoubleProperty(points.get(i));
+        DoubleProperty yProperty = new SimpleDoubleProperty(points.get(i + 1));
+        xProperty.addListener(new ChangeListener<Number>() {
+            @Override public void changed(ObservableValue<? extends Number> ov, Number oldX, Number x) {
+                points.set(idx, (double) x);
+            }
+        });
+        yProperty.addListener(new ChangeListener<Number>() {
+            @Override public void changed(ObservableValue<? extends Number> ov, Number oldY, Number y) {
+                points.set(idx + 1, (double) y);
+            }
+        });
+        anchors.add(new Anchor(Color.BLUE, xProperty, yProperty));
     }
-
     return anchors;
   }
-
-  // a draggable anchor displayed around a point.
-  
 }

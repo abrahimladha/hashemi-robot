@@ -44,13 +44,13 @@ public class AI_PROJ1 extends Application {
     static Group root = new Group();
     static Group possiblepaths = new Group();
     static PriorityQueue<Node> openList;
-    static ArrayList<Node> closedList;
+    static HashSet<Node> closedList;
     HashMap<Node, Double> gVals = new HashMap<>();
     HashMap<Node, Double> fVals = new HashMap<>();
     static ArrayList<Node> allnodes = new ArrayList<>();
     static ArrayList<Node> nodes = new ArrayList<>();
     
-    
+    static ArrayList<Node> shortestpath = new ArrayList<>();
     
     @Override public void start(final Stage stage) throws Exception {
         
@@ -287,11 +287,13 @@ public class AI_PROJ1 extends Application {
         allnodes.add(startnode);
         allnodes.add(endnode);
         for(int w = 0; w < allnodes.size(); w++){
-            HashSet<Node> thing = whatsVisible(allnodes.get(w));
-            for(Node temp : thing){    
-                if(!allnodes.get(w).getNeighbors().contains(temp))
-                    allnodes.get(w).addNeighbor(temp);
-            }
+            //HashSet<Node> thing = whatsVisible(allnodes.get(w));
+            //for(Node temp : thing){    
+            //    if(!allnodes.get(w).getNeighbors().contains(temp) && temp != allnodes.get(w))
+            //
+            //allnodes.get(w).addNeighbor(temp);
+            allnodes.get(w).setNeighbors(whatsVisible(allnodes.get(w)));
+            //}
                     //nodes.get(w).setNeighbors(whatsVisible(nodes.get(w).getX(),nodes.get(w).getY()));
             
         }
@@ -309,8 +311,11 @@ public class AI_PROJ1 extends Application {
         traverse(startnode,endnode);
         //System.out.println(nodes.get(0).getX() + "  " + nodes.get(0).getY());
         //traverse(startnode,endnode);
-        
-    
+        Polyline sline = new Polyline();
+        //for(Node n : shortestpath)
+          //  sline.getPoints().add((double)(n.getX()),(double)(n.getY()));
+        //sline.getStrokeWidth(2);
+       // root.getChildren().add(sline);
     
     }
  }
@@ -327,56 +332,49 @@ public void darnNodeFiller(){
 
 }
 public void traverse(Node begin, Node end) {
-    openList = new PriorityQueue<Node>(1000, new fCompare());
-    closedList = new ArrayList<>();
-    openList.clear();
-    //openList = new
-    closedList.clear();
-    //fVals.clear();
-    //gVals.clear();
+   openList = new PriorityQueue<Node>(1000, new fCompare());
+    closedList = new HashSet<>();
+     openList.clear(); 
+ //   closedList.clear();
+   // fVals.clear();
+   // gVals.clear();
+    HashMap<Node,Node> cameFrom = new HashMap<Node,Node>();
     gVals.put(begin,0.0);
     openList.add(begin);
-     
-    //fVals.put(begin,Math.sqrt(h(begin,end))); 
     while(!openList.isEmpty()) {
       Node current = openList.element();
-        //System.out.println(openList.size());    
-        //System.out.println(current.getData());
         if (current.equals(end)) {
             begin.setParent(null);
             System.out.println("Goal Reached!");
-            printPath(current.getParent());
+            printPath(current);
+            //reconstructpath(cameFrom,current);
             return;
         }
-        //System.out.println("neighbors" + neighbors.size());
         
         closedList.add(openList.poll());
         
         HashSet<Node> neighbors = current.getNeighbors();
-        //closedList.add(openList.poll());
-        //System.out.println(neighbors); 
-        //System.out.println("neighbors" + neighbors.size());
         for (Node neighbor : neighbors) {
-            
             double gScore = gVals.get(current) + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
             double fScore = gScore + h(neighbor, current);
-        //    System.out.println(neighbors);
-        //    System.out.println(closedList);
+        
             if(closedList.contains(neighbor)) {
                 System.out.println("contains");
-                if(gVals.get(neighbor) == null) {
+            //    if(gVals.get(neighbor) == null) {
                     gVals.put(neighbor, gScore);
-                }
-                if(fVals.get(neighbor) == null) {
+            //    }
+            //    if(fVals.get(neighbor) == null) {
                     fVals.put(neighbor, fScore);
-                }
+            //    }
             //    if(closedList.contains(neighbor)){
                 if(fScore >= fVals.get(neighbor)) {
                     continue;
                 }
             }
             if (!openList.contains(neighbor) || fScore < fVals.get(neighbor)) {
+                //current.setParent(neighbor);
                 neighbor.setParent(current);
+                //cameFrom.put(neighbor,current);
                 gVals.put(neighbor, gScore);
                 fVals.put(neighbor, fScore);
             
@@ -385,25 +383,47 @@ public void traverse(Node begin, Node end) {
                     System.out.println("added");
                 }
             }
-            /*
-            if(closedList.contains(neighbor)) {
-                continue;
-            }
-            double gScore = gVals.get(current) + EuclideanDistance(neighbor.getX(),neighbor.getY(),current.getX(),current.getY());
-            if(!openList.contains(neighbor)){
-                openList.add(neighbor);
-            }
-            else if(gScore >= gVals.get(neighbor)){
-                continue;
-            }
-
-            neighbor.setParent(current);
-            gVals.put(neighbor,gScore);
-            double fScore = gScore + h(neighbor,end);
-            fVals.put(neighbor,fScore);*/
+            
         }
     }
-    System.out.println("FAIL");
+      System.out.println("FAIL");
+}
+public void ftraverse(Node begin, Node end){
+    openList = new PriorityQueue<Node>(new fCompare());
+    closedList = new HashSet<>();
+    gVals.put(begin,0.0);
+    while(!openList.isEmpty()) {
+        Node current = openList.element();
+        if(current.equals(end)) {
+            System.out.println("Goal Reached!");
+            printPath(current);
+            return;
+        }
+        closedList.add(openList.poll());
+        HashSet<Node> neighbors = current.getNeighbors();
+        for(Node neighbor : neighbors){
+            double gScore = gVals.get(current) + Math.sqrt(h(current,neighbor));
+            double fScore = gScore + Math.sqrt(h(neighbor,end));
+            
+            if(closedList.contains(neighbor)){
+                //if(gVals.get(neighbor) == null)
+                    gVals.put(neighbor,gScore);
+                //if(fVals.get(neighbor) == null)
+                    fVals.put(neighbor,fScore);
+                if(fScore >= fVals.get(neighbor))
+                    continue;
+            }
+            if(!openList.contains(neighbor) || fScore < fVals.get(neighbor)){
+                neighbor.setParent(current);
+                gVals.put(neighbor,gScore);
+                fVals.put(neighbor,fScore);
+                if(!openList.contains(neighbor)) {
+                    openList.add(neighbor);
+                }
+            }
+        }
+    }
+    System.out.println("you failed!");
 }
 public double EuclideanDistance(double x1, double y1, double x2, double y2){
    return Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2 - y1,2));
@@ -426,21 +446,12 @@ public void printPath(Node node) {
         System.out.println(node.getData());
     }
 }
-public void asdprintPath(Node node) {
-    ArrayList<Node> path = new ArrayList<>();
-    path.add(node);
-    while(true){
-        if(node.getParent() == null){
-            break;
-        }
-        node = node.getParent();
-        path.add(node);
-
-        
-    }
-    System.out.println(path);
-
-
+public void reconstructpath(HashMap<Node,Node> map, Node current) {
+    System.out.println(current.getData());
+        while(map.containsKey(current)){               
+            current = map.get(current);
+            System.out.println(current.getData());
+        }   
 }
 
 class fCompare implements Comparator<Node> {
@@ -513,7 +524,7 @@ private static HashSet<Node> whatsVisible(Node vertex){
         totalError = Shape.union(totalError,error3);
     for(Polygon tri : triangles){   
         Shape inter = Shape.intersect(totalError,tri);
-        if(inter.getLayoutBounds().getHeight() <= 0 || inter.getLayoutBounds().getWidth() <= 0){
+        if(inter.getLayoutBounds().getHeight() < 0 || inter.getLayoutBounds().getWidth() < 0){
             Node one = new Node(tri.getPoints().get(2),tri.getPoints().get(3));
             Node two = new Node(tri.getPoints().get(4),tri.getPoints().get(5));
             int dex1 = allnodes.indexOf(one);
